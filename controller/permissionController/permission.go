@@ -27,6 +27,20 @@ func FindPermission(opts FindPermissionOptions, result *[]*model.Permission) err
 	return model.Find(model.PermissionCollName, filter, &result)
 }
 
+type CreatePermissionOptions struct {
+	Category string `json:"category,omitempty" example:"USER"`                      // 權限種類
+	Code     string `json:"code,omitempty" binding:"required" example:"createUser"` // 權限代號
+}
+
+func CreatePermission(opts CreatePermissionOptions, result *model.Permission) error {
+	permission := model.Permission{
+		Category: opts.Category,
+		Code:     opts.Code,
+	}
+
+	return model.Insert(model.PermissionCollName, permission, result)
+}
+
 // 啟用權限
 func EnablePermission(objectId *primitive.ObjectID) error {
 	return model.Enable(model.PermissionCollName, objectId)
