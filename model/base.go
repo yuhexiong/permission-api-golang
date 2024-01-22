@@ -16,6 +16,7 @@ const (
 	DeleteStatus uint8 = 9    // 9: 刪除
 )
 
+// 尋找
 func Find(collectionName string, filter interface{}, result interface{}) error {
 	util.GreenLog("Find(%s) filter(%+v)", collectionName, filter)
 	var pipeline = mongo.Pipeline{}
@@ -46,16 +47,39 @@ func Find(collectionName string, filter interface{}, result interface{}) error {
 	return nil
 }
 
+// 啟用
+func Enable(collectionName string, objectId *primitive.ObjectID) error {
+	util.GreenLog("Enable(%s) objectId(%+v)", collectionName, objectId)
+
+	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"id": objectId}, bson.D{{Key: "$status", Value: NormalStatus}})
+	if err != nil {
+		util.RedLog("Enable err: %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// 刪除
 func Delete(collectionName string, objectId *primitive.ObjectID, forceDelete bool) error {
 	util.GreenLog("Delete(%s) objectId(%+v)", collectionName, objectId)
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	var err error
 	if forceDelete {
-		config.GetCollection(config.GetDB(), collectionName).DeleteMany(c, bson.M{"id": objectId})
+		_, err = config.GetCollection(config.GetDB(), collectionName).DeleteMany(c, bson.M{"id": objectId})
 	} else {
-		config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"id": objectId}, bson.D{{Key: "$status", Value: NormalStatus}})
+		_, err = config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"id": objectId}, bson.D{{Key: "$status", Value: NormalStatus}})
+	}
+
+	if err != nil {
+		util.RedLog("Delete err: %s", err.Error())
+		return err
 	}
 
 	return nil
