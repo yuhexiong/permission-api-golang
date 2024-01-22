@@ -27,6 +27,11 @@ func FindPermission(opts FindPermissionOptions, result *[]*model.Permission) err
 	return model.Find(model.PermissionCollName, filter, &result)
 }
 
+// 啟用權限
+func EnablePermission(objectId *primitive.ObjectID) error {
+	return model.Enable(model.PermissionCollName, objectId)
+}
+
 // 刪除權限
 func DeletePermission(objectId *primitive.ObjectID) error {
 	return model.Delete(model.PermissionCollName, objectId, false)
