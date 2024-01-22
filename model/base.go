@@ -48,6 +48,22 @@ func Find(collectionName string, filter interface{}, result interface{}) error {
 }
 
 // 啟用
+func Insert(collectionName string, data interface{}, result interface{}) error {
+	util.GreenLog("Insert(%s) data(%+v)", collectionName, data)
+
+	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := config.GetCollection(config.GetDB(), collectionName).InsertOne(c, data)
+	if err != nil {
+		util.RedLog("Insert err: %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// 啟用
 func Enable(collectionName string, objectId *primitive.ObjectID) error {
 	util.GreenLog("Enable(%s) objectId(%+v)", collectionName, objectId)
 
