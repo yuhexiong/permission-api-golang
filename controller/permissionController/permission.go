@@ -4,6 +4,7 @@ import (
 	"permission-api/model"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type FindPermissionOptions struct {
@@ -23,9 +24,10 @@ func FindPermission(opts FindPermissionOptions, result *[]*model.Permission) err
 		filter = append(filter, bson.E{Key: "code", Value: opts.Code})
 	}
 
-	if err := model.Find(model.PermissionCollName, filter, &result); err != nil {
-		return err
-	}
+	return model.Find(model.PermissionCollName, filter, &result)
+}
 
-	return nil
+// 刪除權限
+func DeletePermission(objectId *primitive.ObjectID) error {
+	return model.Delete(model.PermissionCollName, objectId, false)
 }
