@@ -12,7 +12,7 @@ type FindPermissionOptions struct {
 	Code     *string `json:"code" bson:"code,omitempty" example:"createUser"`   // 權限代號
 }
 
-// 取得所有權限
+// 取得權限
 func FindPermission(opts FindPermissionOptions, result *[]*model.Permission) error {
 	filter := bson.D{}
 
@@ -32,6 +32,7 @@ type CreatePermissionOptions struct {
 	Code     string `json:"code,omitempty" binding:"required" example:"createUser"` // 權限代號
 }
 
+// 新增權限
 func CreatePermission(opts CreatePermissionOptions, result *model.Permission) error {
 	permission := model.Permission{
 		Category: opts.Category,

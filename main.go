@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"permission-api/config"
+	"permission-api/controller/permissionController"
 	"permission-api/router"
 
 	"github.com/gin-gonic/gin"
@@ -12,8 +13,11 @@ import (
 func main() {
 	app := gin.Default()
 
-	// Run database
+	// database
 	config.ConnectDB()
+
+	// viper
+	permissionController.InitViper()
 
 	// Router
 	router.UserRoute(app)
