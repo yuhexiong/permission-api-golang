@@ -22,6 +22,7 @@ type User struct {
 	Status       *uint8              `bson:"status,omitempty" json:"status" example:"0"` // 0: 正常, 9: 刪除
 	CreatedAt    *time.Time          `bson:"createdAt,omitempty" json:"createdAt" example:"2022-03-21T10:30:17.711Z"`
 	UpdatedAt    *time.Time          `bson:"updatedAt,omitempty" json:"updatedAt" example:"2022-03-21T10:30:17.711Z"`
+	UserId       string              `bson:"userId" json:"userId" example:"abd1234"` // 帳號
 	PasswordSalt string              `bson:"_password_salt,omitempty" json:"-"`
 	PasswordHash string              `bson:"_password_hash,omitempty" json:"-"`
 	Name         string              `bson:"name,omitempty" json:"name" example:"艾瑞克"`           // 姓名

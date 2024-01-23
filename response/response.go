@@ -10,12 +10,12 @@ type UserResponse struct {
 
 // Error codes
 const (
-	BodyParserError  = 1000
-	InvalidParameter = 108
-	InvalidDbData    = 300
+	BodyParserError  = "001000"
+	InvalidParameter = "000108"
+	InvalidDbData    = "000300"
 )
 
-// new error response.
+// new error response
 func NewErrorResponse(c *gin.Context, statusCode int, message string, data interface{}) {
 	c.JSON(statusCode, UserResponse{
 		Status:  statusCode,
