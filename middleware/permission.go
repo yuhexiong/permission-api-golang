@@ -32,7 +32,7 @@ func PermissionMiddle() gin.HandlerFunc {
 // 驗證是否有此權限
 func CheckPermission(accountInfo *AccountInfo, pDef permissionController.PermissionDef, ops permissionController.PermissionOp) bool {
 	permissionKey := fmt.Sprintf("%s-%s", pDef.Category, pDef.Code)
-	permissionOps := (*accountInfo.PermissionOpMap)[permissionKey]
+	permissionOps := (*accountInfo.PermissionMap)[permissionKey]
 
 	for _, op := range permissionOps {
 		if op == ops {
