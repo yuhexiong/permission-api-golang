@@ -6,6 +6,7 @@ require (
 	github.com/fsnotify/fsnotify v1.7.0
 	github.com/gin-contrib/cors v1.5.0
 	github.com/gin-gonic/gin v1.9.1
+	github.com/golang-jwt/jwt v3.2.2+incompatible
 	github.com/joho/godotenv v1.5.1
 	github.com/spf13/viper v1.18.2
 	go.mongodb.org/mongo-driver v1.13.1

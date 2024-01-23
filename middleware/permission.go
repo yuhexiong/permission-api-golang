@@ -20,8 +20,8 @@ func PermissionMiddle() gin.HandlerFunc {
 		}
 
 		// 檢查使用者是否擁有指定的權限
-		accountInfo := GetAccountInfo(c)
-		hasPermission := CheckPermission(accountInfo, *PermsDef, *PermsOp)
+		permissionInfo := GetPermissionInfo(c)
+		hasPermission := CheckPermission(permissionInfo, *PermsDef, *PermsOp)
 		if !hasPermission {
 			c.AbortWithError(http.StatusBadRequest, errors.New(""))
 		}
@@ -30,9 +30,9 @@ func PermissionMiddle() gin.HandlerFunc {
 }
 
 // 驗證是否有此權限
-func CheckPermission(accountInfo *AccountInfo, pDef permissionController.PermissionDef, ops permissionController.PermissionOp) bool {
+func CheckPermission(permissionInfo *PermissionInfo, pDef permissionController.PermissionDef, ops permissionController.PermissionOp) bool {
 	permissionKey := fmt.Sprintf("%s-%s", pDef.Category, pDef.Code)
-	permissionOps := (*accountInfo.PermissionMap)[permissionKey]
+	permissionOps := (*permissionInfo.PermissionMap)[permissionKey]
 
 	for _, op := range permissionOps {
 		if op == ops {
