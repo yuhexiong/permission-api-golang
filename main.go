@@ -1,18 +1,20 @@
 package main
 
 import (
+	"fmt"
+	"net/http"
 	"os"
 	"permission-api/config"
 	"permission-api/controller/permissionController"
 	"permission-api/router"
+	"permission-api/util"
+	"strconv"
+	"time"
 
-	"github.com/gin-gonic/gin"
 	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
-	app := gin.Default()
-
 	// database
 	config.ConnectDB()
 
@@ -20,8 +22,25 @@ func main() {
 	permissionController.InitViper()
 
 	// Router
-	router.UserRoute(app)
+	router := router.InitRouter()
 
-	apiPort := os.Getenv("API_PORT")
-	app.Run(":" + apiPort)
+	// setup http server
+	apiPortStr := os.Getenv("API_PORT")
+	apiPort, err := strconv.Atoi(apiPortStr)
+	if err != nil {
+		panic(err)
+	}
+
+	server := &http.Server{
+		Addr:           fmt.Sprintf(":%d", apiPort),
+		Handler:        router,
+		ReadTimeout:    10 * time.Second,
+		WriteTimeout:   10 * time.Second,
+		MaxHeaderBytes: 1 << 20,
+	}
+
+	if err := server.ListenAndServe(); err != nil {
+		util.RedLog("Server error:", err)
+	}
+	util.GreenLog("Server run at port:", apiPort)
 }

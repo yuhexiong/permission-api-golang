@@ -3,12 +3,13 @@ package permissionController
 import (
 	"fmt"
 	"permission-api/model"
+	"strings"
 
 	"github.com/fsnotify/fsnotify"
 	"github.com/spf13/viper"
 )
 
-var permissionViper *viper.Viper
+var permViper *viper.Viper
 var PermissionsMap = make(map[string]PermissionDef)
 var apiToPermissionMap = make(map[string]ApiPermissionInfo)
 
@@ -26,23 +27,23 @@ const (
 )
 
 type ApiToPermission struct {
-	Url            string         `mapstructure:"Url"`
-	Methods        string         `mapstructure:"Methods"`
-	PermissionName string         `mapstructure:"PermissionName"`
-	PermissionOp   []PermissionOp `mapstructure:"PermissionOp"`
+	Url            string       `mapstructure:"Url"`
+	Methods        string       `mapstructure:"Methods"`
+	PermissionName string       `mapstructure:"PermissionName"`
+	PermissionOp   PermissionOp `mapstructure:"PermissionOp"`
 }
 
 type ApiPermissionInfo struct {
 	PermissionName string
-	PermissionOp   []PermissionOp
+	PermissionOp   PermissionOp
 }
 
 func InitViper() {
-	permissionViper = viper.New()
-	permissionViper.SetConfigName("permissionDefs")
-	permissionViper.SetConfigType("yaml")
-	permissionViper.AddConfigPath("etc/")
-	err := permissionViper.ReadInConfig()
+	permViper = viper.New()
+	permViper.SetConfigName("permissionDefs")
+	permViper.SetConfigType("yaml")
+	permViper.AddConfigPath("etc/")
+	err := permViper.ReadInConfig()
 	if err != nil {
 		fmt.Printf("read config failed: %v", err)
 	}
@@ -50,8 +51,8 @@ func InitViper() {
 	loadPermissionsMap()
 	loadApiToPermission()
 
-	permissionViper.OnConfigChange(func(e fsnotify.Event) {
-		err := permissionViper.ReadInConfig()
+	permViper.OnConfigChange(func(e fsnotify.Event) {
+		err := permViper.ReadInConfig()
 		if err != nil {
 			fmt.Printf("read config failed: %v", err)
 		}
@@ -59,13 +60,13 @@ func InitViper() {
 		loadApiToPermission()
 	})
 
-	permissionViper.WatchConfig()
+	permViper.WatchConfig()
 }
 
 func loadPermissionsMap() {
 	// 取得yaml的權限並存入map, reset PermissionsMap as empty map
 	PermissionsMap = make(map[string]PermissionDef)
-	permissionsYAML := permissionViper.GetStringMap("PermissionDefs")
+	permissionsYAML := permViper.GetStringMap("PermissionDefs")
 	for key, value := range permissionsYAML {
 		data := value.(map[string]interface{})
 		PermissionsMap[key] = PermissionDef{
@@ -139,21 +140,18 @@ func checkPermissionExistInDB(foundPermissions []*model.Permission, p Permission
 
 func loadApiToPermission() {
 	var apiToPermissionsYAML []ApiToPermission
-	if err := permissionViper.UnmarshalKey("APIToPermission", &apiToPermissionsYAML); err != nil {
+	if err := permViper.UnmarshalKey("APIToPermission", &apiToPermissionsYAML); err != nil {
 		panic(err)
 	}
 
 	for _, apiToPermissionYAML := range apiToPermissionsYAML {
 		key := fmt.Sprintf("%s-%s", apiToPermissionYAML.Methods, apiToPermissionYAML.Url)
 
-		var permissionOp []PermissionOp
-		for _, op := range apiToPermissionYAML.PermissionOp {
-			switch op {
-			case READ:
-				permissionOp = append(permissionOp, READ)
-			case WRITE:
-				permissionOp = append(permissionOp, WRITE)
-			}
+		var permissionOp PermissionOp
+		if apiToPermissionYAML.PermissionOp == READ {
+			permissionOp = READ
+		} else if apiToPermissionYAML.PermissionOp == WRITE {
+			permissionOp = WRITE
 		}
 
 		apiToPermissionMap[key] = ApiPermissionInfo{
@@ -161,4 +159,18 @@ func loadApiToPermission() {
 			PermissionOp:   permissionOp,
 		}
 	}
+}
+
+func GetApiPermission(fullPath string, method string) (*PermissionDef, *PermissionOp) {
+	apiRoute := fmt.Sprintf("%s-%s", method, fullPath)
+
+	for api, permissionInfo := range apiToPermissionMap {
+		if apiRoute == api {
+			permissionDef, ok := PermissionsMap[strings.ToLower(permissionInfo.PermissionName)]
+			if ok {
+				return &permissionDef, &permissionInfo.PermissionOp
+			}
+		}
+	}
+	return nil, nil
 }
