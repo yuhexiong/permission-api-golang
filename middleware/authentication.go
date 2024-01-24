@@ -4,6 +4,7 @@ import (
 	"os"
 	"permission-api/controller/permissionController"
 	"permission-api/model"
+	"permission-api/util"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -27,10 +28,10 @@ type Claims struct {
 func CreateToken(user *model.User, signedString *string) error {
 	var expiresAt int64
 
-	if model.UserTypeOpt(user.UserType) == model.UserTypeSystem {
-		expiresAt = time.Now().Add(3153600000000000000).Unix() // 100年
+	if model.UserType(user.UserType) == model.UserTypeSystem {
+		expiresAt = time.Now().Add(util.SystemTokenLifeTime).Unix() // 100年
 	} else {
-		expiresAt = time.Now().Add(86400000000000).Unix() // 1天
+		expiresAt = time.Now().Add(util.NormalTokenLifeTime).Unix() // 1天
 	}
 
 	claims := Claims{

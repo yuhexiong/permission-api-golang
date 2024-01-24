@@ -16,11 +16,11 @@ var MongoClient *mongo.Client
 
 func ConnectDB() *mongo.Client {
 	mongoUrl := os.Getenv("MONGO_URL")
-	clientOptions := options.Client().ApplyURI(mongoUrl)
+	clientOpts := options.Client().ApplyURI(mongoUrl)
 	var ctx = context.TODO()
 
 	// Connect to MongoDB
-	client, err := mongo.Connect(ctx, clientOptions)
+	client, err := mongo.Connect(ctx, clientOpts)
 	if err != nil {
 		log.Fatal(err)
 	}
