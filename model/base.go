@@ -47,6 +47,39 @@ func Find(collectionName string, filter interface{}, result interface{}) error {
 	return nil
 }
 
+// 尋找一位
+func Get(collectionName string, filter interface{}, result interface{}) error {
+	util.GreenLog("Find(%s) filter(%+v)", collectionName, filter)
+	var pipeline = mongo.Pipeline{}
+	if filter != nil {
+		pipeline = append(pipeline, bson.D{{Key: "$match", Value: filter}})
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	coll := config.GetCollection(config.GetDB(), collectionName)
+	cursor, err := coll.Aggregate(c, pipeline)
+
+	if err != nil {
+		util.RedLog("Get err: %s", err.Error())
+		return err
+	}
+
+	if !cursor.TryNext(context.TODO()) {
+		return mongo.ErrNoDocuments
+	}
+
+	if result != nil {
+		if err := cursor.Decode(result); err != nil {
+			util.RedLog("Get - decode err:  %s", err.Error())
+			return err
+		}
+	}
+
+	return nil
+}
+
 // 啟用
 func Insert(collectionName string, data interface{}, result interface{}) error {
 	util.GreenLog("Insert(%s) data(%+v)", collectionName, data)
