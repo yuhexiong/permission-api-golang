@@ -1,4 +1,4 @@
-package controller
+package sessionController
 
 import (
 	"permission-api/model"
@@ -35,7 +35,12 @@ func CreateSession(token string, user *model.User) error {
 	return model.Insert(model.SessionCollName, session, nil)
 }
 
-// 取得該使用者的的登入憑證
-func DeleteSessionByUserId(objectId *primitive.ObjectID, result *[]*model.Session) error {
-	return model.Find(model.SessionCollName, bson.D{{Key: "_id", Value: objectId}}, &result)
+// 刪除該使用者的的登入憑證
+func DeleteSessionByUserId(userOId *primitive.ObjectID) error {
+	return model.DeleteByFilter(model.SessionCollName, bson.D{{Key: "_id", Value: userOId}}, true)
+}
+
+// 由token取得登入憑證
+func GetSessionByToken(token string, result *model.Session) error {
+	return model.Get(model.SessionCollName, bson.D{{Key: "sessionToken", Value: token}}, &result)
 }

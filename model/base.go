@@ -112,7 +112,32 @@ func Enable(collectionName string, objectId *primitive.ObjectID) error {
 	return nil
 }
 
-// 刪除
+// 依條件刪除
+func DeleteByFilter(collectionName string, filter interface{}, forceDelete bool) error {
+	util.GreenLog("Delete(%s) filter(%+v)", collectionName, filter)
+
+	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	var err error
+	if forceDelete {
+		_, err = config.GetCollection(config.GetDB(), collectionName).DeleteMany(c, mongo.Pipeline{bson.D{{Key: "$match", Value: filter}}})
+	} else {
+		_, err = config.GetCollection(config.GetDB(), collectionName).UpdateMany(c,
+			bson.D{{Key: "$set", Value: bson.D{{Key: "status", Value: DeleteStatus}}}},
+			mongo.Pipeline{bson.D{{Key: "$match", Value: filter}}},
+		)
+	}
+
+	if err != nil {
+		util.RedLog("Delete err: %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// 依id刪除
 func Delete(collectionName string, objectId *primitive.ObjectID, forceDelete bool) error {
 	util.GreenLog("Delete(%s) objectId(%+v)", collectionName, objectId)
 
@@ -123,7 +148,7 @@ func Delete(collectionName string, objectId *primitive.ObjectID, forceDelete boo
 	if forceDelete {
 		_, err = config.GetCollection(config.GetDB(), collectionName).DeleteMany(c, bson.M{"id": objectId})
 	} else {
-		_, err = config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"id": objectId}, bson.D{{Key: "$status", Value: NormalStatus}})
+		_, err = config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"id": objectId}, bson.D{{Key: "$status", Value: DeleteStatus}})
 	}
 
 	if err != nil {

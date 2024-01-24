@@ -4,7 +4,11 @@ import (
 	"crypto/hmac"
 	"crypto/sha512"
 	"encoding/hex"
+	"time"
 )
+
+var SystemTokenLifeTime = 3153600000000000000 * time.Nanosecond
+var NormalTokenLifeTime = 86400000000000 * time.Nanosecond
 
 // 驗證密碼
 func ValidatePassword(userPasswordHash string, userPasswordSalt string, password string) bool {

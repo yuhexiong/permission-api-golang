@@ -9,7 +9,7 @@ import (
 const PermissionCollName = "permission"
 
 type Permission struct {
-	ID        *primitive.ObjectID `bson:"id,omitempty" json:"id" example:"623853b9503ce2ecdd221c94"`
+	ID        *primitive.ObjectID `bson:"_id,omitempty" json:"_id" example:"623853b9503ce2ecdd221c94"`
 	Status    *uint8              `bson:"status,omitempty" json:"status" example:"0"` // 0: 正常, 9: 刪除
 	CreatedAt *time.Time          `bson:"createdAt,omitempty" json:"createdAt" example:"2022-03-21T10:30:17.711Z"`
 	UpdatedAt *time.Time          `bson:"updatedAt,omitempty" json:"updatedAt" example:"2022-03-21T10:30:17.711Z"`
