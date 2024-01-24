@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"permission-api/controller/permissionController"
+	"permission-api/model"
 
 	"github.com/gin-gonic/gin"
 )
@@ -30,7 +31,7 @@ func PermissionMiddle() gin.HandlerFunc {
 }
 
 // 驗證是否有此權限
-func CheckPermission(permissionInfo *PermissionInfo, pDef permissionController.PermissionDef, ops permissionController.PermissionOp) bool {
+func CheckPermission(permissionInfo *permissionController.PermissionInfo, pDef permissionController.PermissionDef, ops model.PermissionOp) bool {
 	permissionKey := fmt.Sprintf("%s-%s", pDef.Category, pDef.Code)
 	permissionOps := (*permissionInfo.PermissionMap)[permissionKey]
 

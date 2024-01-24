@@ -2,10 +2,9 @@ package response
 
 import "github.com/gin-gonic/gin"
 
-type UserResponse struct {
-	Status  int         `json:"status"`
-	Message string      `json:"message"`
-	Data    interface{} `json:"data"`
+type JsonResult struct {
+	Code int `json:"code"` // 錯誤代號，無異常時為 0
+	Data any `json:"data"` // 結果資料
 }
 
 // Error codes
@@ -16,10 +15,9 @@ const (
 )
 
 // new error response
-func NewErrorResponse(c *gin.Context, statusCode int, message string, data interface{}) {
-	c.JSON(statusCode, UserResponse{
-		Status:  statusCode,
-		Message: message,
-		Data:    data,
+func ResFormat(c *gin.Context, statusCode int, code int, data interface{}) {
+	c.JSON(statusCode, JsonResult{
+		Code: code,
+		Data: data,
 	})
 }

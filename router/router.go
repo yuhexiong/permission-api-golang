@@ -11,6 +11,8 @@ func InitRouter() *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
+	// router.Use(middleware.AuthorizeToken)
+
 	InitUserRouter(router.Group("/user"))
 	InitPermissionRouter(router.Group("/permission"))
 

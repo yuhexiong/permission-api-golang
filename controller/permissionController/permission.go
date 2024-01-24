@@ -51,3 +51,15 @@ func EnablePermission(objectId *primitive.ObjectID) error {
 func DeletePermission(objectId *primitive.ObjectID) error {
 	return model.Delete(model.PermissionCollName, objectId, false)
 }
+
+type PermissionInfo struct {
+	UserOId       string                           `json:"userOId" example:"623853b9503ce2ecdd221c94"` // 始俑者 ObjectId
+	PermissionMap *map[string][]model.PermissionOp `json:"-"`                                          // 權限key: [category]-[code] value: "R","W"
+}
+
+// TODO: 取得權限
+func GetPermissionInfoByUser(userOId *primitive.ObjectID) (*[]*PermissionInfo, error) {
+
+	var permissionInfo *[]*PermissionInfo
+	return permissionInfo, nil
+}

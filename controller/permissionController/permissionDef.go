@@ -18,24 +18,16 @@ type PermissionDef struct {
 	Code     string `json:"code" binding:"required" example:"createUser"` // 權限代號
 }
 
-// 讀、寫兩種執行權限
-type PermissionOp string
-
-const (
-	READ  PermissionOp = "R"
-	WRITE PermissionOp = "W"
-)
-
 type ApiToPermission struct {
-	Url            string       `mapstructure:"Url"`
-	Methods        string       `mapstructure:"Methods"`
-	PermissionName string       `mapstructure:"PermissionName"`
-	PermissionOp   PermissionOp `mapstructure:"PermissionOp"`
+	Url            string             `mapstructure:"Url"`
+	Methods        string             `mapstructure:"Methods"`
+	PermissionName string             `mapstructure:"PermissionName"`
+	PermissionOp   model.PermissionOp `mapstructure:"PermissionOp"`
 }
 
 type ApiPermissionInfo struct {
 	PermissionName string
-	PermissionOp   PermissionOp
+	PermissionOp   model.PermissionOp
 }
 
 func InitViper() {
@@ -147,11 +139,11 @@ func loadApiToPermission() {
 	for _, apiToPermissionYAML := range apiToPermissionsYAML {
 		key := fmt.Sprintf("%s-%s", apiToPermissionYAML.Methods, apiToPermissionYAML.Url)
 
-		var permissionOp PermissionOp
-		if apiToPermissionYAML.PermissionOp == READ {
-			permissionOp = READ
-		} else if apiToPermissionYAML.PermissionOp == WRITE {
-			permissionOp = WRITE
+		var permissionOp model.PermissionOp
+		if apiToPermissionYAML.PermissionOp == model.READ {
+			permissionOp = model.READ
+		} else if apiToPermissionYAML.PermissionOp == model.WRITE {
+			permissionOp = model.WRITE
 		}
 
 		apiToPermissionMap[key] = ApiPermissionInfo{
@@ -161,7 +153,7 @@ func loadApiToPermission() {
 	}
 }
 
-func GetApiPermission(fullPath string, method string) (*PermissionDef, *PermissionOp) {
+func GetApiPermission(fullPath string, method string) (*PermissionDef, *model.PermissionOp) {
 	apiRoute := fmt.Sprintf("%s-%s", method, fullPath)
 
 	for api, permissionInfo := range apiToPermissionMap {

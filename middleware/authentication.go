@@ -1,10 +1,14 @@
 package middleware
 
 import (
+	"errors"
+	"net/http"
 	"os"
 	"permission-api/controller/permissionController"
+	"permission-api/controller/sessionController"
 	"permission-api/model"
 	"permission-api/util"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -16,6 +20,30 @@ var jwtKey string
 
 func init() {
 	jwtKey = os.Getenv("JWTKey")
+}
+
+func AuthorizeToken(c *gin.Context) {
+	auth := c.GetHeader("Authorization")
+	splits := strings.Split(auth, "Bearer ")
+	if len(splits) < 2 {
+		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
+	}
+
+	token := splits[1]
+	var session *model.Session
+	err := sessionController.GetSessionByToken(token, session)
+	if err != nil || session.SessionToken == "" {
+		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
+	}
+
+	permissionInfo, err := permissionController.GetPermissionInfoByUser(session.UserOId)
+	if err == nil {
+		SetPermissionInfo(c, permissionInfo)
+	}
+
+	setSessionToken(c, token)
+
+	c.Next()
 }
 
 type Claims struct {
@@ -53,23 +81,26 @@ func CreateToken(user *model.User, signedString *string) error {
 	return nil
 }
 
-type PermissionInfo struct {
-	UserOId       string                                          `json:"userOId" example:"623853b9503ce2ecdd221c94"` // 始俑者 ObjectId
-	PermissionMap *map[string][]permissionController.PermissionOp `json:"-"`                                          // 權限key: [category]-[code] value: "R","W"
+func setSessionToken(c *gin.Context, token string) {
+	c.Set("sessionToken", token)
 }
 
-func SetPermissionInfo(c *gin.Context, permissionInfo *PermissionInfo) {
+func GetSessionToken(c *gin.Context) string {
+	return c.GetString("sessionToken")
+}
+
+func SetPermissionInfo(c *gin.Context, permissionInfo *[]*permissionController.PermissionInfo) {
 	if permissionInfo != nil {
 		c.Set("permissionInfo", permissionInfo)
 	}
 }
 
-func GetPermissionInfo(c *gin.Context) *PermissionInfo {
+func GetPermissionInfo(c *gin.Context) *permissionController.PermissionInfo {
 	permissionInfo, exists := c.Get("permissionInfo")
 
 	if !exists {
 		return nil
 	}
 
-	return permissionInfo.(*PermissionInfo)
+	return permissionInfo.(*permissionController.PermissionInfo)
 }
