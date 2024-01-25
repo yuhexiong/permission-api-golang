@@ -24,6 +24,13 @@ func Find(collectionName string, filter interface{}, result interface{}) error {
 		pipeline = append(pipeline, bson.D{{Key: "$match", Value: filter}})
 	}
 
+	return FindByPipeline(collectionName, pipeline, result)
+}
+
+// 使用 pipeline 尋找
+func FindByPipeline(collectionName string, pipeline mongo.Pipeline, result interface{}) error {
+	util.GreenLog("Find(%s) pipeline(%+v)", collectionName, pipeline)
+
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 

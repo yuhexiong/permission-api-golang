@@ -2,23 +2,34 @@ package util
 
 import (
 	"crypto/hmac"
+	"crypto/rand"
 	"crypto/sha512"
 	"encoding/hex"
+	"math"
 	"time"
 )
 
 var SystemTokenLifeTime = 3153600000000000000 * time.Nanosecond
 var NormalTokenLifeTime = 86400000000000 * time.Nanosecond
 
-// 驗證密碼
-func ValidatePassword(userPasswordHash string, userPasswordSalt string, password string) bool {
-	return userPasswordHash == HashPasswordWithSalt(password, userPasswordSalt)
+// 產生16進位字串
+func GenerateHex(n int) (string, error) {
+	b := make([]byte, int(math.Ceil(float64(n)/2)))
+	_, err := rand.Read(b)
+
+	if err != nil {
+		return "", err
+	}
+
+	return hex.EncodeToString(b), nil
 }
 
 // 加密密碼
 func HashPasswordWithSalt(password string, salt string) string {
-	h := hmac.New(sha512.New, []byte(salt))
-	h.Write([]byte(password))
+	return hex.EncodeToString(hmac.New(sha512.New, []byte(salt)).Sum([]byte(password)))
+}
 
-	return hex.EncodeToString(h.Sum(nil))
+// 驗證密碼
+func ValidatePassword(userPasswordHash string, userPasswordSalt string, password string) bool {
+	return userPasswordHash == HashPasswordWithSalt(password, userPasswordSalt)
 }

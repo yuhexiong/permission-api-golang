@@ -25,6 +25,6 @@ type User struct {
 	UserId       string              `bson:"userId" json:"userId" example:"abd1234"` // 帳號
 	PasswordSalt string              `bson:"_password_salt,omitempty" json:"-"`
 	PasswordHash string              `bson:"_password_hash,omitempty" json:"-"`
-	Name         string              `bson:"name,omitempty" json:"name" example:"欸逼西滴"`          // 姓名
-	UserType     UserType            `bson:"userType,omitempty" json:"userType" example:"OTHER"` // 使用者類別 MANAGER=管理層, EMPLOYEE=員工, OTHER=其他, SYSTEM=系統
+	Name         string              `bson:"name" json:"name" example:"欸逼西滴"`          // 姓名
+	UserType     UserType            `bson:"userType" json:"userType" example:"OTHER"` // 使用者類別 MANAGER=管理層, EMPLOYEE=員工, OTHER=其他, SYSTEM=系統
 }

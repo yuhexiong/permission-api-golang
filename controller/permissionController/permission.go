@@ -1,10 +1,12 @@
 package permissionController
 
 import (
+	"fmt"
 	"permission-api/model"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type FindPermissionOpts struct {
@@ -52,14 +54,46 @@ func DeletePermission(objectId *primitive.ObjectID) error {
 	return model.Delete(model.PermissionCollName, objectId, false)
 }
 
-type PermissionInfo struct {
-	UserOId       string                           `json:"userOId" example:"623853b9503ce2ecdd221c94"` // 始俑者 ObjectId
-	PermissionMap *map[string][]model.PermissionOp `json:"-"`                                          // 權限key: [category]-[code] value: "R","W"
+type PermissionDetails struct {
+	Category string `bson:"category,omitempty" json:"category" example:"USER"`
+	Code     string `bson:"code,omitempty" json:"code" example:"createUser"`
 }
 
-// TODO: 取得權限
-func GetPermissionInfoByUser(userOId *primitive.ObjectID) (*[]*PermissionInfo, error) {
+type MapUserPermissionWithDetails struct {
+	model.MapUserPermission `bson:",inline"`
+	PermissionDetails       `bson:",inline"`
+}
 
-	var permissionInfo *[]*PermissionInfo
-	return permissionInfo, nil
+type PermissionInfo struct {
+	UserOId       string                           `json:"userOId" example:"623853b9503ce2ecdd221c94"` // 始俑者 ObjectId
+	PermissionMap *map[string][]model.PermissionOp `json:"-"`                                          // 權限key: [category]-[code] value: "R,W"
+}
+
+// 取得該使用者的權限
+func GetPermissionInfoByUser(userOId *primitive.ObjectID) (*map[string][]model.PermissionOp, error) {
+	var userPermissions []MapUserPermissionWithDetails
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: bson.D{{Key: "userOId", Value: userOId}}}},
+		{{Key: "$lookup", Value: bson.D{
+			{Key: "from", Value: model.PermissionCollName},
+			{Key: "localField", Value: "permissionOId"},
+			{Key: "foreignField", Value: "_id"},
+			{Key: "as", Value: "permissionDetails"},
+		}}},
+		{{Key: "$unwind", Value: "$permissionDetails"}},
+	}
+
+	err := model.FindByPipeline(model.MapUserPermissionCollName, pipeline, userPermissions)
+	if err != nil {
+		return nil, err
+	}
+
+	permissionOp := make(map[string][]model.PermissionOp)
+	for _, userPermission := range userPermissions {
+		permissionKey := fmt.Sprintf("%s-%s", userPermission.PermissionDetails.Category, userPermission.PermissionDetails.Code)
+		permissionOp[permissionKey] = userPermission.Operations
+	}
+
+	return &permissionOp, nil
 }
