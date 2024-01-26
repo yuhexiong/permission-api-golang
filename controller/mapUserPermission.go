@@ -3,6 +3,7 @@ package controller
 import (
 	"permission-api/model"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -20,4 +21,9 @@ func CreateUserPermission(opts CreateUserPermissionOpts, result *model.MapUserPe
 		Operations:    opts.Operations,
 	}
 	return model.Insert(model.MapUserPermissionCollName, userPermission, result)
+}
+
+// 刪除使用者與權限對應關係
+func DeleteUserPermission(userOId *primitive.ObjectID) error {
+	return model.DeleteByFilter(model.MapUserPermissionCollName, bson.D{{Key: "userOId", Value: userOId}}, true)
 }

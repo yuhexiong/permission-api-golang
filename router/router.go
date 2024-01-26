@@ -42,3 +42,7 @@ func corsConfig() cors.Config {
 
 	return config
 }
+
+func RouterPerms(router *gin.RouterGroup, method, path string, handler gin.HandlerFunc) {
+	router.Handle(method, path, middleware.PermissionMiddle(), handler)
+}

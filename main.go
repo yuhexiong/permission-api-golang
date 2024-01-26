@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"permission-api/config"
+	"permission-api/controller"
 	"permission-api/controller/permissionController"
 	"permission-api/router"
 	"permission-api/util"
@@ -23,6 +24,9 @@ func main() {
 
 	// Router
 	router := router.InitRouter()
+
+	// init AdminUser
+	controller.InitAdminUser()
 
 	// setup http server
 	apiPortStr := os.Getenv("API_PORT")

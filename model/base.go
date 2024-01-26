@@ -101,7 +101,7 @@ func Insert(collectionName string, data interface{}, result interface{}) error {
 		return err
 	}
 
-	if err == nil && insertResult != nil && result != nil {
+	if err == nil && insertResult != nil && result == nil {
 		return Get(collectionName, bson.D{{Key: "_id", Value: insertResult.InsertedID}}, result)
 	}
 
@@ -133,11 +133,11 @@ func DeleteByFilter(collectionName string, filter interface{}, forceDelete bool)
 
 	var err error
 	if forceDelete {
-		_, err = config.GetCollection(config.GetDB(), collectionName).DeleteMany(c, mongo.Pipeline{bson.D{{Key: "$match", Value: filter}}})
+		_, err = config.GetCollection(config.GetDB(), collectionName).DeleteMany(c, filter)
 	} else {
 		_, err = config.GetCollection(config.GetDB(), collectionName).UpdateMany(c,
 			bson.D{{Key: "$set", Value: bson.D{{Key: "status", Value: DeleteStatus}}}},
-			mongo.Pipeline{bson.D{{Key: "$match", Value: filter}}},
+			filter,
 		)
 	}
 

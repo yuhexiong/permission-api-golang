@@ -5,14 +5,14 @@ import (
 	"permission-api/util"
 
 	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 )
 
 func InitValidator() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
 		v.RegisterValidation("permissionOp", OperationsValidation)
 	} else {
-		util.RedLog("can not init validator")
+		util.RedLog("init validator error")
 	}
 }
 

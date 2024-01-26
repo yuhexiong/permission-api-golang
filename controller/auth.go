@@ -2,11 +2,56 @@ package controller
 
 import (
 	"errors"
+	"permission-api/controller/permissionController"
 	"permission-api/controller/sessionController"
 	"permission-api/middleware"
 	"permission-api/model"
 	"permission-api/util"
 )
+
+func InitAdminUser() error {
+	// 建立系統使用者
+	adminUser := model.User{}
+	GetUserByUserId("admin", &adminUser)
+
+	// 如果沒有admin, 則新建一位
+	if adminUser.ID == nil {
+		createUserOpts := CreateUserOpts{
+			UserId:   "admin",
+			Password: "password",
+			Name:     "系統使用者",
+			UserType: string(model.UserTypeSystem),
+		}
+
+		err := CreateUser(createUserOpts, &adminUser)
+		if err != nil {
+			return err
+		}
+	}
+
+	// 刪除 admin 的所有權限
+	DeleteUserPermission(adminUser.ID)
+
+	// 取得目前有的權限
+	permissions := []*model.Permission{}
+	if err := permissionController.FindPermission(permissionController.FindPermissionOpts{}, &permissions); err != nil {
+		return err
+	}
+
+	// 賦予系統使用者所有權限
+	for _, permission := range permissions {
+		createUserPermission := CreateUserPermissionOpts{
+			UserOId:       adminUser.ID,
+			PermissionOId: permission.ID,
+			Operations:    []model.PermissionOp{model.READ, model.WRITE},
+		}
+		if err := CreateUserPermission(createUserPermission, nil); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
 
 type LoginOpts struct {
 	UserId   string `json:"userId" binding:"required"`   // 帳號
