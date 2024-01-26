@@ -22,6 +22,7 @@ func InitRouter() *gin.Engine {
 	// 其餘需驗證 token
 	InitUserRouter(routerWithAuth.Group("/user"))
 	InitPermissionRouter(routerWithAuth.Group("/permission"))
+	InitUserPermissionRouter(routerWithAuth.Group("/userPermission"))
 
 	return router
 }
