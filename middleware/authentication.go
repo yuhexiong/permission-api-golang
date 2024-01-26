@@ -30,17 +30,18 @@ func AuthorizeToken(c *gin.Context) {
 	}
 
 	token := splits[1]
-	var session *model.Session
-	err := sessionController.GetSessionByToken(token, session)
+	var session model.Session
+	err := sessionController.GetSessionByToken(token, &session)
 	if err != nil || session.SessionToken == "" {
 		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
 	}
 
 	permissionMap, err := permissionController.GetPermissionInfoByUser(session.UserOId)
-	if err == nil {
-		SetPermissionMap(c, permissionMap)
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
 	}
 
+	SetPermissionMap(c, permissionMap)
 	setSessionToken(c, token)
 
 	c.Next()
@@ -90,7 +91,7 @@ func GetSessionToken(c *gin.Context) string {
 }
 
 func SetPermissionMap(c *gin.Context, permissionMap *map[string][]model.PermissionOp) {
-	if permissionMap != nil {
+	if len(*permissionMap) > 0 {
 		c.Set("permissionMap", permissionMap)
 	}
 }

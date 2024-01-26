@@ -11,7 +11,7 @@ import (
 
 // 取得該使用者的的登入憑證
 func FindSessionByUserId(objectId *primitive.ObjectID, result *[]*model.Session) error {
-	return model.Find(model.SessionCollName, bson.D{{Key: "_id", Value: objectId}}, &result)
+	return model.Find(model.SessionCollName, bson.D{{Key: "userOId", Value: objectId}}, result)
 }
 
 // 新增登入憑證

@@ -3,6 +3,7 @@ package permissionController
 import (
 	"fmt"
 	"permission-api/model"
+	"permission-api/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -26,7 +27,7 @@ func FindPermission(opts FindPermissionOpts, result *[]*model.Permission) error 
 		filter = append(filter, bson.E{Key: "code", Value: opts.Code})
 	}
 
-	return model.Find(model.PermissionCollName, filter, &result)
+	return model.Find(model.PermissionCollName, filter, result)
 }
 
 type CreatePermissionOpts struct {
@@ -37,6 +38,7 @@ type CreatePermissionOpts struct {
 // 新增權限
 func CreatePermission(opts CreatePermissionOpts, result *model.Permission) error {
 	permission := model.Permission{
+		Status:   util.GetPointer(model.NormalStatus),
 		Category: opts.Category,
 		Code:     opts.Code,
 	}
@@ -71,7 +73,7 @@ type PermissionInfo struct {
 
 // 取得該使用者的權限
 func GetPermissionInfoByUser(userOId *primitive.ObjectID) (*map[string][]model.PermissionOp, error) {
-	var userPermissions []MapUserPermissionWithDetails
+	var userPermissions []*MapUserPermissionWithDetails
 
 	pipeline := mongo.Pipeline{
 		{{Key: "$match", Value: bson.D{{Key: "userOId", Value: userOId}}}},
@@ -84,7 +86,7 @@ func GetPermissionInfoByUser(userOId *primitive.ObjectID) (*map[string][]model.P
 		{{Key: "$unwind", Value: "$permissionDetails"}},
 	}
 
-	err := model.FindByPipeline(model.MapUserPermissionCollName, pipeline, userPermissions)
+	err := model.FindByPipeline(model.MapUserPermissionCollName, pipeline, &userPermissions)
 	if err != nil {
 		return nil, err
 	}

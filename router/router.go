@@ -1,6 +1,8 @@
 package router
 
 import (
+	"permission-api/middleware"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
@@ -11,10 +13,15 @@ func InitRouter() *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
-	// router.Use(middleware.AuthorizeToken)
+	routerWithAuth := router.Group("")
+	routerWithAuth.Use(middleware.AuthorizeToken)
 
-	InitUserRouter(router.Group("/user"))
-	InitPermissionRouter(router.Group("/permission"))
+	// auth 不需驗證 token
+	InitAuthRouter(router.Group("/auth"))
+
+	// 其餘需驗證 token
+	InitUserRouter(routerWithAuth.Group("/user"))
+	InitPermissionRouter(routerWithAuth.Group("/permission"))
 
 	return router
 }

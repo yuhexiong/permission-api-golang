@@ -42,12 +42,12 @@ func FindByPipeline(collectionName string, pipeline mongo.Pipeline, result inter
 		return err
 	}
 
-	if result != nil && cursor.TryNext(context.Background()) {
+	if result != nil && cursor.Next(context.Background()) {
 		c, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
 		if err := cursor.All(c, result); err != nil {
-			util.RedLog("Find - decode err:  %s", err.Error())
+			util.RedLog("Find - decode err: %s", err.Error())
 			return err
 		}
 	}
@@ -56,7 +56,8 @@ func FindByPipeline(collectionName string, pipeline mongo.Pipeline, result inter
 
 // 尋找一位
 func Get(collectionName string, filter interface{}, result interface{}) error {
-	util.GreenLog("Find(%s) filter(%+v)", collectionName, filter)
+	util.GreenLog("Get(%s) filter(%+v)", collectionName, filter)
+
 	var pipeline = mongo.Pipeline{}
 	if filter != nil {
 		pipeline = append(pipeline, bson.D{{Key: "$match", Value: filter}})
@@ -94,10 +95,14 @@ func Insert(collectionName string, data interface{}, result interface{}) error {
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := config.GetCollection(config.GetDB(), collectionName).InsertOne(c, data)
+	insertResult, err := config.GetCollection(config.GetDB(), collectionName).InsertOne(c, data)
 	if err != nil {
 		util.RedLog("Insert err: %s", err.Error())
 		return err
+	}
+
+	if err == nil && insertResult != nil && result != nil {
+		return Get(collectionName, bson.D{{Key: "_id", Value: insertResult.InsertedID}}, result)
 	}
 
 	return nil

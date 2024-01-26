@@ -2,9 +2,9 @@ package config
 
 import (
 	"context"
-	"fmt"
 	"log"
 	"os"
+	"permission-api/util"
 
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -29,7 +29,7 @@ func ConnectDB() *mongo.Client {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Connected to MongoDB!")
+	util.GreenLog("Connected to MongoDB!")
 
 	MongoClient = client
 	return client
