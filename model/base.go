@@ -18,7 +18,7 @@ const (
 
 // 尋找
 func Find(collectionName string, filter interface{}, result interface{}) error {
-	util.GreenLog("Find(%s) filter(%+v)", collectionName, filter)
+	util.BlueLog("Find(%s) filter(%+v)", collectionName, filter)
 	var pipeline = mongo.Pipeline{}
 	if filter != nil {
 		pipeline = append(pipeline, bson.D{{Key: "$match", Value: filter}})
@@ -29,7 +29,7 @@ func Find(collectionName string, filter interface{}, result interface{}) error {
 
 // 使用 pipeline 尋找
 func FindByPipeline(collectionName string, pipeline mongo.Pipeline, result interface{}) error {
-	util.GreenLog("Find(%s) pipeline(%+v)", collectionName, pipeline)
+	util.BlueLog("Find(%s) pipeline(%+v)", collectionName, pipeline)
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -56,7 +56,7 @@ func FindByPipeline(collectionName string, pipeline mongo.Pipeline, result inter
 
 // 尋找一位
 func Get(collectionName string, filter interface{}, result interface{}) error {
-	util.GreenLog("Get(%s) filter(%+v)", collectionName, filter)
+	util.BlueLog("Get(%s) filter(%+v)", collectionName, filter)
 
 	var pipeline = mongo.Pipeline{}
 	if filter != nil {
@@ -90,7 +90,7 @@ func Get(collectionName string, filter interface{}, result interface{}) error {
 
 // 啟用
 func Insert(collectionName string, data interface{}, result interface{}) error {
-	util.GreenLog("Insert(%s) data(%+v)", collectionName, data)
+	util.BlueLog("Insert(%s) data(%+v)", collectionName, data)
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -110,7 +110,7 @@ func Insert(collectionName string, data interface{}, result interface{}) error {
 
 // 啟用
 func Enable(collectionName string, objectId *primitive.ObjectID) error {
-	util.GreenLog("Enable(%s) objectId(%+v)", collectionName, objectId)
+	util.BlueLog("Enable(%s) objectId(%+v)", collectionName, objectId)
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -126,7 +126,7 @@ func Enable(collectionName string, objectId *primitive.ObjectID) error {
 
 // 依條件刪除
 func DeleteByFilter(collectionName string, filter interface{}, forceDelete bool) error {
-	util.GreenLog("Delete(%s) filter(%+v)", collectionName, filter)
+	util.BlueLog("Delete(%s) filter(%+v)", collectionName, filter)
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
@@ -151,7 +151,7 @@ func DeleteByFilter(collectionName string, filter interface{}, forceDelete bool)
 
 // 依id刪除
 func Delete(collectionName string, objectId *primitive.ObjectID, forceDelete bool) error {
-	util.GreenLog("Delete(%s) objectId(%+v)", collectionName, objectId)
+	util.BlueLog("Delete(%s) objectId(%+v)", collectionName, objectId)
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()

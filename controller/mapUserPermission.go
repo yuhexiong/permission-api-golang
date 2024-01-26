@@ -7,9 +7,9 @@ import (
 )
 
 type CreateUserPermissionOpts struct {
-	UserOId       *primitive.ObjectID  `bson:"userOId" json:"userOId"`                     // 使用者 objectId
-	PermissionOId *primitive.ObjectID  `bson:"permissionOId" json:"permissionOId"`         // 權限 objectId
-	Operations    []model.PermissionOp `bson:"operations" json:"operations" example:"W,R"` // 讀或寫
+	UserOId       *primitive.ObjectID  `bson:"userOId" json:"userOId" binding:"required"`                                  // 使用者 objectId
+	PermissionOId *primitive.ObjectID  `bson:"permissionOId" json:"permissionOId" binding:"required"`                      // 權限 objectId
+	Operations    []model.PermissionOp `bson:"operations" json:"operations" binding:"required,permissionOp" example:"W,R"` // 讀或寫
 }
 
 // 建立使用者與權限對應關係
