@@ -1,11 +1,11 @@
 package middleware
 
 import (
-	"errors"
 	"fmt"
-	"net/http"
 	"permission-api/controller/permissionController"
 	"permission-api/model"
+	"permission-api/response"
+	"permission-api/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -24,7 +24,7 @@ func PermissionMiddle() gin.HandlerFunc {
 		permissionMap := GetPermissionMap(c)
 		hasPermission := CheckPermission(permissionMap, *PermsDef, *PermsOp)
 		if !hasPermission {
-			c.AbortWithError(http.StatusBadRequest, errors.New("no permission"))
+			response.AbortError(c, util.PermissionDeniedError(fmt.Sprintf("on %s - %s", *PermsDef, *PermsOp)))
 			return
 		}
 		c.Next()

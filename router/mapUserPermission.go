@@ -5,6 +5,7 @@ import (
 	"permission-api/controller"
 	"permission-api/model"
 	"permission-api/response"
+	"permission-api/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,16 +18,16 @@ func createUserPermission(c *gin.Context) {
 	var createUserPermissionOpts controller.CreateUserPermissionOpts
 
 	if err := c.ShouldBindJSON(&createUserPermissionOpts); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}
 
 	userPermission := model.MapUserPermission{}
 	err := controller.CreateUserPermission(createUserPermissionOpts, &userPermission)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}
 
-	response.ResFormat(c, http.StatusOK, 0, userPermission)
+	response.SuccessFormat(c, userPermission)
 }

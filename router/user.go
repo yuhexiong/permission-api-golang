@@ -1,13 +1,13 @@
 package router
 
 import (
-	"errors"
 	"net/http"
 	"permission-api/controller"
 	"permission-api/controller/permissionController"
 	"permission-api/middleware"
 	"permission-api/model"
 	"permission-api/response"
+	"permission-api/util"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -21,7 +21,7 @@ func createUser(c *gin.Context) {
 	var createUserOpts controller.CreateUserOpts
 
 	if err := c.ShouldBindJSON(&createUserOpts); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}
 
@@ -30,7 +30,7 @@ func createUser(c *gin.Context) {
 		permissionMap := middleware.GetPermissionMap(c)
 		permissionDef := permissionController.PermissionsMap[strings.ToLower("CreateSystemAccount")]
 		if !middleware.CheckPermission(permissionMap, permissionDef, model.WRITE) {
-			c.AbortWithError(http.StatusBadRequest, errors.New("not have permission to create system account"))
+			response.AbortError(c, util.PermissionDeniedError("on create system user"))
 			return
 		}
 	}
@@ -38,9 +38,9 @@ func createUser(c *gin.Context) {
 	createdUser := model.User{}
 	err := controller.CreateUser(createUserOpts, &createdUser)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}
 
-	response.ResFormat(c, http.StatusOK, 0, createdUser)
+	response.SuccessFormat(c, createdUser)
 }

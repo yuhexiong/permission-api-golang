@@ -1,12 +1,11 @@
 package middleware
 
 import (
-	"errors"
-	"net/http"
 	"os"
 	"permission-api/controller/permissionController"
 	"permission-api/controller/sessionController"
 	"permission-api/model"
+	"permission-api/response"
 	"permission-api/util"
 	"strings"
 	"time"
@@ -26,7 +25,7 @@ func AuthorizeToken(c *gin.Context) {
 	auth := c.GetHeader("Authorization")
 	splits := strings.Split(auth, "Bearer ")
 	if len(splits) < 2 {
-		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
+		response.AbortError(c, util.InvalidParameterError("on token format"))
 		return
 	}
 
@@ -34,13 +33,13 @@ func AuthorizeToken(c *gin.Context) {
 	var session model.Session
 	err := sessionController.GetSessionByToken(token, &session)
 	if err != nil || session.SessionToken == "" {
-		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
+		response.AbortError(c, util.InvalidParameterError("on get session by token"))
 		return
 	}
 
 	permissionMap, err := permissionController.GetPermissionInfoByUser(session.UserOId)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
+		response.AbortError(c, util.InvalidParameterError("on get permissionMap by user"))
 		return
 	}
 

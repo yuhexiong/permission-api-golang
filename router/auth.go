@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"permission-api/controller"
 	"permission-api/response"
+	"permission-api/util"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,15 +17,15 @@ func login(c *gin.Context) {
 	var loginOpt controller.LoginOpts
 
 	if err := c.ShouldBindJSON(&loginOpt); err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}
 
 	token, err := controller.Login(loginOpt)
 	if err != nil {
-		c.AbortWithError(http.StatusBadRequest, err)
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}
 
-	response.ResFormat(c, http.StatusOK, 0, token)
+	response.SuccessFormat(c, token)
 }
