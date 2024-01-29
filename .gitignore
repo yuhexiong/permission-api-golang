@@ -1,2 +1,2 @@
 .env
-etc/permissionDefs.yaml
+etc/apiPermission.yaml

@@ -18,12 +18,14 @@ func createUserPermission(c *gin.Context) {
 
 	if err := c.ShouldBindJSON(&createUserPermissionOpts); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	userPermission := model.MapUserPermission{}
 	err := controller.CreateUserPermission(createUserPermissionOpts, &userPermission)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
+		return
 	}
 
 	response.ResFormat(c, http.StatusOK, 0, userPermission)

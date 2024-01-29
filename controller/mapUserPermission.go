@@ -15,12 +15,12 @@ type CreateUserPermissionOpts struct {
 
 // 建立使用者與權限對應關係
 func CreateUserPermission(opts CreateUserPermissionOpts, result *model.MapUserPermission) error {
-	userPermission := &model.MapUserPermission{
+	userPermission := model.MapUserPermission{
 		UserOId:       opts.UserOId,
 		PermissionOId: opts.PermissionOId,
 		Operations:    opts.Operations,
 	}
-	return model.Insert(model.MapUserPermissionCollName, userPermission, result)
+	return model.Insert(model.MapUserPermissionCollName, &userPermission, result)
 }
 
 // 刪除使用者與權限對應關係

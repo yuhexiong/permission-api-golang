@@ -16,6 +16,24 @@ const (
 	DeleteStatus uint8 = 9    // 9: 刪除
 )
 
+type BaseTime struct {
+	CreatedAt *time.Time `bson:"createdAt,omitempty" json:"createdAt" example:"2022-03-21T10:30:17.711Z"`
+	UpdatedAt *time.Time `bson:"updatedAt,omitempty" json:"updatedAt" example:"2022-03-21T10:30:17.711Z"`
+}
+
+type BaseTimeInterface interface {
+	SetCreatedAt(time.Time)
+	SetUpdatedAt(time.Time)
+}
+
+func (data *BaseTime) SetCreatedAt(t time.Time) {
+	data.CreatedAt = &t
+}
+
+func (data *BaseTime) SetUpdatedAt(t time.Time) {
+	data.UpdatedAt = &t
+}
+
 // 尋找
 func Find(collectionName string, filter interface{}, result interface{}) error {
 	util.BlueLog("Find(%s) filter(%+v)", collectionName, filter)
@@ -88,13 +106,15 @@ func Get(collectionName string, filter interface{}, result interface{}) error {
 	return nil
 }
 
-// 啟用
-func Insert(collectionName string, data interface{}, result interface{}) error {
+// 新增
+func Insert(collectionName string, data BaseTimeInterface, result interface{}) error {
 	util.BlueLog("Insert(%s) data(%+v)", collectionName, data)
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
+	data.SetCreatedAt(time.Now())
+	data.SetUpdatedAt(time.Now())
 	insertResult, err := config.GetCollection(config.GetDB(), collectionName).InsertOne(c, data)
 	if err != nil {
 		util.RedLog("Insert err: %s", err.Error())
@@ -158,9 +178,9 @@ func Delete(collectionName string, objectId *primitive.ObjectID, forceDelete boo
 
 	var err error
 	if forceDelete {
-		_, err = config.GetCollection(config.GetDB(), collectionName).DeleteMany(c, bson.M{"id": objectId})
+		_, err = config.GetCollection(config.GetDB(), collectionName).DeleteMany(c, bson.M{"_id": objectId})
 	} else {
-		_, err = config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"id": objectId}, bson.D{{Key: "$status", Value: DeleteStatus}})
+		_, err = config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"_id": objectId}, bson.M{"$set": bson.M{"status": DeleteStatus}})
 	}
 
 	if err != nil {

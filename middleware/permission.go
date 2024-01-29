@@ -25,6 +25,7 @@ func PermissionMiddle() gin.HandlerFunc {
 		hasPermission := CheckPermission(permissionMap, *PermsDef, *PermsOp)
 		if !hasPermission {
 			c.AbortWithError(http.StatusBadRequest, errors.New("no permission"))
+			return
 		}
 		c.Next()
 	}

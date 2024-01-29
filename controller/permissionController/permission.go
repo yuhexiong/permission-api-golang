@@ -43,7 +43,7 @@ func CreatePermission(opts CreatePermissionOpts, result *model.Permission) error
 		Code:     opts.Code,
 	}
 
-	return model.Insert(model.PermissionCollName, permission, result)
+	return model.Insert(model.PermissionCollName, &permission, result)
 }
 
 // 啟用權限

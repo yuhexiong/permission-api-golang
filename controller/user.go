@@ -5,6 +5,7 @@ import (
 	"permission-api/util"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type CreateUserOpts struct {
@@ -32,7 +33,12 @@ func CreateUser(opts CreateUserOpts, result *model.User) error {
 	return model.Insert(model.UserCollName, user, result)
 }
 
-// 取得使用者
+// 依userOId取得使用者
+func GetUserByUserOId(userOId *primitive.ObjectID, result *model.User) error {
+	return model.Get(model.UserCollName, bson.D{{Key: "_id", Value: userOId}}, &result)
+}
+
+// 依userId取得使用者
 func GetUserByUserId(userId string, result *model.User) error {
 	return model.Get(model.UserCollName, bson.D{{Key: "userId", Value: userId}}, &result)
 }

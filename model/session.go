@@ -16,6 +16,7 @@ const SessionTypeSystem SessionType = "system"
 
 type Session struct {
 	ID           *primitive.ObjectID `bson:"_id,omitempty" json:"_id" example:"623853b9503ce2ecdd221c94"`
+	BaseTime     `bson:"inline"`
 	UserOId      *primitive.ObjectID `bson:"userOId" json:"userOId"` // 使用者 objectId
 	SessionToken string              `bson:"sessionToken"`
 	Type         SessionType         `bson:"type"`

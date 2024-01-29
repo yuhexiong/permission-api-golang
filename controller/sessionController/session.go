@@ -32,7 +32,7 @@ func CreateSession(token string, user *model.User) error {
 		ExpiresAt:    &expiresAt,
 	}
 
-	return model.Insert(model.SessionCollName, session, nil)
+	return model.Insert(model.SessionCollName, &session, nil)
 }
 
 // 刪除該使用者的的登入憑證

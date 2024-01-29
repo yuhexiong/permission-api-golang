@@ -27,6 +27,7 @@ func AuthorizeToken(c *gin.Context) {
 	splits := strings.Split(auth, "Bearer ")
 	if len(splits) < 2 {
 		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
+		return
 	}
 
 	token := splits[1]
@@ -34,15 +35,18 @@ func AuthorizeToken(c *gin.Context) {
 	err := sessionController.GetSessionByToken(token, &session)
 	if err != nil || session.SessionToken == "" {
 		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
+		return
 	}
 
 	permissionMap, err := permissionController.GetPermissionInfoByUser(session.UserOId)
 	if err != nil {
 		c.AbortWithError(http.StatusBadRequest, errors.New("invalid token"))
+		return
 	}
 
-	SetPermissionMap(c, permissionMap)
 	setSessionToken(c, token)
+	setUserOId(c, session.UserOId)
+	SetPermissionMap(c, permissionMap)
 
 	c.Next()
 }
@@ -80,6 +84,19 @@ func CreateToken(user *model.User, signedString *string) error {
 	*signedString = signedToken
 
 	return nil
+}
+
+func setUserOId(c *gin.Context, userOId *primitive.ObjectID) {
+	c.Set("userOId", userOId)
+}
+
+func GetUserOId(c *gin.Context) *primitive.ObjectID {
+	userOId, exists := c.Get("userOId")
+	if !exists {
+		return nil
+	}
+
+	return userOId.(*primitive.ObjectID)
 }
 
 func setSessionToken(c *gin.Context, token string) {

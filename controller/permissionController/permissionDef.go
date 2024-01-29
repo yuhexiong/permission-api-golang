@@ -10,7 +10,7 @@ import (
 )
 
 var permViper *viper.Viper
-var permissionsMap = make(map[string]PermissionDef)
+var PermissionsMap = make(map[string]PermissionDef)
 var apiToPermissionMap = make(map[string]ApiPermissionInfo)
 
 type PermissionDef struct {
@@ -32,7 +32,7 @@ type ApiPermissionInfo struct {
 
 func InitViper() {
 	permViper = viper.New()
-	permViper.SetConfigName("permissionDefs")
+	permViper.SetConfigName("apiPermission.yaml")
 	permViper.SetConfigType("yaml")
 	permViper.AddConfigPath("etc/")
 	err := permViper.ReadInConfig()
@@ -56,12 +56,12 @@ func InitViper() {
 }
 
 func loadPermissionsMap() {
-	// 取得yaml的權限並存入map, reset permissionsMap as empty map
-	permissionsMap = make(map[string]PermissionDef)
+	// 取得yaml的權限並存入map, reset PermissionsMap as empty map
+	PermissionsMap = make(map[string]PermissionDef)
 	permissionsYAML := permViper.GetStringMap("PermissionDefs")
 	for key, value := range permissionsYAML {
 		data := value.(map[string]interface{})
-		permissionsMap[key] = PermissionDef{
+		PermissionsMap[key] = PermissionDef{
 			Category: data["category"].(string),
 			Code:     data["code"].(string),
 		}
@@ -78,7 +78,7 @@ func loadPermissionsMap() {
 		if *foundPermission.Status != model.NormalStatus { // 未啟用的權限不驗證
 			continue
 		}
-		if exists := checkPermissionExistInYAML(foundPermission, permissionsMap); !exists {
+		if exists := checkPermissionExistInYAML(foundPermission, PermissionsMap); !exists {
 			if err := DeletePermission(foundPermission.ID); err != nil {
 				panic(err)
 			}
@@ -86,7 +86,7 @@ func loadPermissionsMap() {
 	}
 
 	// yaml有但db無此權限 則新增
-	for _, permissionMap := range permissionsMap {
+	for _, permissionMap := range PermissionsMap {
 		exist, foundPermission := checkPermissionExistInDB(foundPermissions, permissionMap)
 		if !exist {
 			createOpts := CreatePermissionOpts(permissionMap)
@@ -103,8 +103,8 @@ func loadPermissionsMap() {
 
 }
 
-func checkPermissionExistInYAML(foundPermission *model.Permission, permissionsMap map[string]PermissionDef) bool {
-	for _, permissionMap := range permissionsMap {
+func checkPermissionExistInYAML(foundPermission *model.Permission, PermissionsMap map[string]PermissionDef) bool {
+	for _, permissionMap := range PermissionsMap {
 		f := *foundPermission
 		if permissionMap.Category == f.Category && permissionMap.Code == f.Code {
 			return true
@@ -158,7 +158,7 @@ func GetApiPermission(fullPath string, method string) (*PermissionDef, *model.Pe
 
 	for api, permissionInfo := range apiToPermissionMap {
 		if apiRoute == api {
-			permissionDef, ok := permissionsMap[strings.ToLower(permissionInfo.PermissionName)]
+			permissionDef, ok := PermissionsMap[strings.ToLower(permissionInfo.PermissionName)]
 			if ok {
 				return &permissionDef, &permissionInfo.PermissionOp
 			}
