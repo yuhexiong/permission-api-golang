@@ -63,7 +63,7 @@ func Login(opts LoginOpts) (*string, error) {
 	// 取得使用者
 	user := model.User{}
 	if err := GetUserByUserId(opts.UserId, &user); err != nil {
-		return nil, err
+		return nil, util.UserNotFoundError(err.Error())
 	}
 
 	// 驗證密碼

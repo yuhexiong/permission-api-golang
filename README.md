@@ -43,3 +43,10 @@ go run main.go
 
 ### permission 權限
 - POST /permission／find: 搜尋所有權限
+
+
+## Customized Error Code
+- InvalidTokenError: 000002
+- UserNotFoundError: 000003
+- PermissionDeniedError: 000107
+- InvalidParameterError: 000108

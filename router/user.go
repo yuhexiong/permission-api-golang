@@ -22,7 +22,16 @@ func InitUserRouter(routerGroup *gin.RouterGroup) {
 
 func logout(c *gin.Context) {
 	userOId := middleware.GetUserOId(c)
-	sessionController.DeleteSessionByUserOId(userOId)
+	// 取得使用者
+	user := model.User{}
+	if err := controller.GetUserByUserOId(userOId, &user); err != nil {
+		response.AbortError(c, util.UserNotFoundError(err.Error()))
+	}
+
+	// 系統使用者永遠不登出
+	if user.UserType != model.UserTypeSystem {
+		sessionController.DeleteSessionByUserOId(userOId)
+	}
 
 	response.SuccessFormat(c, gin.H{})
 }
