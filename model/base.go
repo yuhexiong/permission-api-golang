@@ -16,22 +16,25 @@ const (
 	DeleteStatus uint8 = 9    // 9: 刪除
 )
 
-type BaseTime struct {
+type BaseData struct {
+	Status    *uint8     `bson:"status,omitempty" json:"status" example:"0"` // 0: 正常, 9: 刪除
 	CreatedAt *time.Time `bson:"createdAt,omitempty" json:"createdAt" example:"2022-03-21T10:30:17.711Z"`
 	UpdatedAt *time.Time `bson:"updatedAt,omitempty" json:"updatedAt" example:"2022-03-21T10:30:17.711Z"`
 }
 
-type BaseTimeInterface interface {
-	SetCreatedAt(time.Time)
-	SetUpdatedAt(time.Time)
-}
+func structToBsonM(data interface{}) (bson.M, error) {
+	document, err := bson.Marshal(data)
+	if err != nil {
+		return nil, err
+	}
 
-func (data *BaseTime) SetCreatedAt(t time.Time) {
-	data.CreatedAt = &t
-}
+	var bsonM bson.M
+	err = bson.Unmarshal(document, &bsonM)
+	if err != nil {
+		return nil, err
+	}
 
-func (data *BaseTime) SetUpdatedAt(t time.Time) {
-	data.UpdatedAt = &t
+	return bsonM, nil
 }
 
 // 尋找
@@ -107,14 +110,19 @@ func Get(collectionName string, filter interface{}, result interface{}) error {
 }
 
 // 新增
-func Insert(collectionName string, data BaseTimeInterface, result interface{}) error {
-	util.BlueLog("Insert(%s) data(%+v)", collectionName, data)
+func Insert(collectionName string, rawData interface{}, result interface{}) error {
+	util.BlueLog("Insert(%s) data(%+v)", collectionName, rawData)
+
+	data, err := structToBsonM(rawData)
+	if err != nil {
+		return err
+	}
+	data["updatedAt"] = time.Now()
+	data["status"] = 0 // 預設新增的資料就是啟用的
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	data.SetCreatedAt(time.Now())
-	data.SetUpdatedAt(time.Now())
 	insertResult, err := config.GetCollection(config.GetDB(), collectionName).InsertOne(c, data)
 	if err != nil {
 		util.RedLog("Insert err: %s", err.Error())
@@ -128,14 +136,41 @@ func Insert(collectionName string, data BaseTimeInterface, result interface{}) e
 	return nil
 }
 
-// 啟用
-func Enable(collectionName string, objectId *primitive.ObjectID) error {
-	util.BlueLog("Enable(%s) objectId(%+v)", collectionName, objectId)
+// 更新
+func Update(collectionName string, objectId *primitive.ObjectID, rawData interface{}) error {
+	util.BlueLog("Update(%s) objectId(%+v) data(%+v)", collectionName, objectId, rawData)
+
+	data, err := structToBsonM(rawData)
+	if err != nil {
+		return err
+	}
+	data["updatedAt"] = time.Now()
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 	defer cancel()
 
-	_, err := config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"id": objectId}, bson.D{{Key: "$status", Value: NormalStatus}})
+	_, err = config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"_id": objectId}, bson.M{"$set": data})
+	if err != nil {
+		util.RedLog("Update err: %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
+// 啟用
+func Enable(collectionName string, objectId *primitive.ObjectID) error {
+	util.BlueLog("Enable(%s) objectId(%+v)", collectionName, objectId)
+
+	data := bson.M{
+		"updatedAt": time.Now(),
+		"status":    0,
+	}
+
+	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err := config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, bson.M{"_id": objectId}, bson.D{{Key: "$set", Value: data}})
 	if err != nil {
 		util.RedLog("Enable err: %s", err.Error())
 		return err

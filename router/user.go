@@ -16,6 +16,7 @@ import (
 
 func InitUserRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodPost, "/logout", logout)
+	RouterPerms(routerGroup, http.MethodPatch, "/password", changePassword)
 	RouterPerms(routerGroup, http.MethodPost, "", createUser)
 	RouterPerms(routerGroup, http.MethodPost, "/find", findUser)
 }
@@ -26,12 +27,44 @@ func logout(c *gin.Context) {
 	user := model.User{}
 	if err := controller.GetUserByUserOId(userOId, &user); err != nil {
 		response.AbortError(c, util.UserNotFoundError(err.Error()))
+		return
 	}
 
 	// 系統使用者永遠不登出
 	if user.UserType != model.UserTypeSystem {
 		sessionController.DeleteSessionByUserOId(userOId)
 	}
+
+	response.SuccessFormat(c, gin.H{})
+}
+
+type ChangePasswordOpts struct {
+	UserId   string `json:"userId" binding:"required"`   // 帳號
+	Password string `json:"password" binding:"required"` // 密碼
+}
+
+func changePassword(c *gin.Context) {
+	var changePasswordOpts ChangePasswordOpts
+
+	if err := c.ShouldBindJSON(&changePasswordOpts); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	// 取得被更新使用者
+	user := model.User{}
+	if err := controller.GetUserByUserId(changePasswordOpts.UserId, &user); err != nil {
+		response.AbortError(c, util.UserNotFoundError(err.Error()))
+		return
+	}
+
+	if ok, err := controller.ChangePassword(&user, changePasswordOpts.Password); !ok || err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	// 刪除使用者舊的登入憑證
+	sessionController.DeleteSessionByUserOId(user.ID)
 
 	response.SuccessFormat(c, gin.H{})
 }
@@ -47,7 +80,7 @@ func createUser(c *gin.Context) {
 	// 如果希望建立系統使用者, 則要有建立系統使用者的權限
 	if model.UserType(createUserOpts.UserType) == model.UserTypeSystem {
 		permissionMap := middleware.GetPermissionMap(c)
-		permissionDef := permissionController.PermissionsMap[strings.ToLower("CreateSystemAccount")]
+		permissionDef := permissionController.PermissionsMap[strings.ToLower("CreateSystemUser")]
 		if !middleware.CheckPermission(permissionMap, permissionDef, model.WRITE) {
 			response.AbortError(c, util.PermissionDeniedError("on create system user"))
 			return

@@ -8,6 +8,30 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
+type PasswordOpts struct {
+	PasswordSalt string `bson:"_password_salt,omitempty" json:"-"`
+	PasswordHash string `bson:"_password_hash,omitempty" json:"-"`
+}
+
+// 修改他人密碼
+func ChangePassword(user *model.User, password string) (bool, error) {
+	passwordSalt, err := util.GenerateHex(16)
+	if err != nil {
+		return false, err
+	}
+
+	passwordHash := util.HashPasswordWithSalt(password, passwordSalt)
+
+	if err = model.Update(
+		model.UserCollName,
+		user.ID,
+		PasswordOpts{PasswordSalt: passwordSalt, PasswordHash: passwordHash}); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 type CreateUserOpts struct {
 	UserId   string `json:"userId" binding:"required"`                   // 帳號
 	Password string `json:"password" binding:"required"`                 // 密碼

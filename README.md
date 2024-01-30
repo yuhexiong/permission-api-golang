@@ -8,14 +8,6 @@ Automatically create a system user (username: admin, password: password) with al
 - Web FrameWork: Gin v1.9.1
 - MongoDB v7.0.2
 
-### ENV
-copy .env.default and rename as .env
-```
-MONGO_URL=
-DB_NAME=
-API_PORT=
-JWTKey=
-```
 
 ### 更新 Modules
 ```
@@ -26,6 +18,19 @@ go get -u && go mod tidy -v
 ### 執行程式
 ```
 go run main.go
+```
+
+## Permission
+copy etc/apiPermission.yaml.default and rename as etc/apiPermission.yaml to restrict api access rights.   
+
+
+### ENV
+copy .env.default and rename as .env
+```
+MONGO_URL=
+DB_NAME=
+API_PORT=
+JWTKey=
 ```
 
 ## API

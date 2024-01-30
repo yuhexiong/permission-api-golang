@@ -3,7 +3,6 @@ package permissionController
 import (
 	"fmt"
 	"permission-api/model"
-	"permission-api/util"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -38,7 +37,6 @@ type CreatePermissionOpts struct {
 // 新增權限
 func CreatePermission(opts CreatePermissionOpts, result *model.Permission) error {
 	permission := model.Permission{
-		Status:   util.GetPointer(model.NormalStatus),
 		Category: opts.Category,
 		Code:     opts.Code,
 	}
