@@ -35,6 +35,10 @@ go run main.go
 
 ### user 使用者
 - POST /user: 建立使用者
+- POST /user/find: 搜尋使用者
+
+### mapUserPermission 使用者與權限關聯
+- POST /mapUserPermission: 建立使用者與權限關聯
 
 ### permission 權限
-- POST /mapUserPermission: 建立使用者與權限關聯
+- POST /permission／find: 搜尋所有權限

@@ -15,6 +15,7 @@ import (
 
 func InitUserRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodPost, "", createUser)
+	RouterPerms(routerGroup, http.MethodPost, "/find", findUser)
 }
 
 func createUser(c *gin.Context) {
@@ -43,4 +44,20 @@ func createUser(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, createdUser)
+}
+
+func findUser(c *gin.Context) {
+	var opts controller.FindUserOpts
+	if err := c.ShouldBindJSON(&opts); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	users := []*model.User{}
+	if err := controller.FindUser(opts, &users); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, users)
 }
