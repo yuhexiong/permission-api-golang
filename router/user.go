@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"permission-api/controller"
 	"permission-api/controller/permissionController"
+	"permission-api/controller/sessionController"
 	"permission-api/middleware"
 	"permission-api/model"
 	"permission-api/response"
@@ -14,8 +15,16 @@ import (
 )
 
 func InitUserRouter(routerGroup *gin.RouterGroup) {
+	RouterPerms(routerGroup, http.MethodPost, "/logout", logout)
 	RouterPerms(routerGroup, http.MethodPost, "", createUser)
 	RouterPerms(routerGroup, http.MethodPost, "/find", findUser)
+}
+
+func logout(c *gin.Context) {
+	userOId := middleware.GetUserOId(c)
+	sessionController.DeleteSessionByUserOId(userOId)
+
+	response.SuccessFormat(c, gin.H{})
 }
 
 func createUser(c *gin.Context) {

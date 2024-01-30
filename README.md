@@ -34,6 +34,7 @@ go run main.go
 - POST /auth/login: 登入
 
 ### user 使用者
+- POST /user/logout: 登出
 - POST /user: 建立使用者
 - POST /user/find: 搜尋使用者
 

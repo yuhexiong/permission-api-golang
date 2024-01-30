@@ -81,7 +81,7 @@ func Login(opts LoginOpts) (*string, error) {
 	}
 	// 移除目前有的登入憑證
 	if len(sessionsByUser) > 0 {
-		sessionController.DeleteSessionByUserId(user.ID)
+		sessionController.DeleteSessionByUserOId(user.ID)
 	}
 
 	// 產生 token

@@ -36,8 +36,8 @@ func CreateSession(token string, user *model.User) error {
 }
 
 // 刪除該使用者的的登入憑證
-func DeleteSessionByUserId(userOId *primitive.ObjectID) error {
-	return model.DeleteByFilter(model.SessionCollName, bson.D{{Key: "_id", Value: userOId}}, true)
+func DeleteSessionByUserOId(userOId *primitive.ObjectID) error {
+	return model.DeleteByFilter(model.SessionCollName, bson.D{{Key: "userOId", Value: userOId}}, true)
 }
 
 // 由token取得登入憑證
