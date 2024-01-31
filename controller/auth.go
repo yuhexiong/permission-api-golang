@@ -68,7 +68,7 @@ func Login(opts LoginOpts) (*string, error) {
 
 	// 驗證密碼
 	if !util.ValidatePassword(user.PasswordHash, user.PasswordSalt, opts.Password) {
-		return nil, errors.New("")
+		return nil, util.WrongPasswordError("on login")
 	}
 
 	var sessionsByUser []*model.Session

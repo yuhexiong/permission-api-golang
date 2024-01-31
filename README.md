@@ -40,18 +40,21 @@ JWTKey=
 
 ### user 使用者
 - POST /user/logout: 登出
-- POST /user: 建立使用者
+- PATCH /user/myPassword: 修改自己的密碼
+- PATCH /user/{userId}/password: 修改別人的密碼（需有權限）
+- POST /user: 建立使用者（需有權限）
 - POST /user/find: 搜尋使用者
 
 ### mapUserPermission 使用者與權限關聯
-- POST /mapUserPermission: 建立使用者與權限關聯
+- POST /mapUserPermission: 建立使用者與權限關聯（需有權限）
 
 ### permission 權限
-- POST /permission／find: 搜尋所有權限
+- POST /permission／find: 搜尋所有權限（需有權限）
 
 
 ## Customized Error Code
 - InvalidTokenError: 000002
-- UserNotFoundError: 000003
+- WrongPasswordError: 000003
+- UserNotFoundError: 000004
 - PermissionDeniedError: 000107
 - InvalidParameterError: 000108

@@ -13,6 +13,35 @@ type PasswordOpts struct {
 	PasswordHash string `bson:"_password_hash,omitempty" json:"-"`
 }
 
+type ResetPasswordOpts struct {
+	OldPassword string `json:"oldPassword" binding:"required"` // 舊密碼
+	NewPassword string `json:"newPassword" binding:"required"` // 新密碼
+}
+
+// 修改自己密碼
+func ResetPassword(user *model.User, opts ResetPasswordOpts) (bool, error) {
+	// 驗證密碼
+	if !util.ValidatePassword(user.PasswordHash, user.PasswordSalt, opts.OldPassword) {
+		return false, util.WrongPasswordError("on reset password")
+	}
+
+	passwordSalt, err := util.GenerateHex(16)
+	if err != nil {
+		return false, err
+	}
+
+	passwordHash := util.HashPasswordWithSalt(opts.NewPassword, passwordSalt)
+
+	if err = model.Update(
+		model.UserCollName,
+		user.ID,
+		PasswordOpts{PasswordSalt: passwordSalt, PasswordHash: passwordHash}); err != nil {
+		return false, err
+	}
+
+	return true, nil
+}
+
 // 修改他人密碼
 func ChangePassword(user *model.User, password string) (bool, error) {
 	passwordSalt, err := util.GenerateHex(16)

@@ -16,8 +16,12 @@ func InvalidTokenError(message string) ErrorFormat {
 	return ErrorFormat{StatusCode: http.StatusBadRequest, Code: "000002", Message: "[InvalidToken]" + message}
 }
 
+func WrongPasswordError(message string) ErrorFormat {
+	return ErrorFormat{StatusCode: http.StatusBadRequest, Code: "000003", Message: "[WrongPassword]" + message}
+}
+
 func UserNotFoundError(message string) ErrorFormat {
-	return ErrorFormat{StatusCode: http.StatusBadRequest, Code: "000003", Message: "[UserNotFound]" + message}
+	return ErrorFormat{StatusCode: http.StatusBadRequest, Code: "000004", Message: "[UserNotFound]" + message}
 }
 
 func PermissionDeniedError(message string) ErrorFormat {
