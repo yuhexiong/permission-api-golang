@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"os"
 	"permission-api/controller/permissionController"
 	"permission-api/controller/sessionController"
 	"permission-api/middleware"
@@ -16,9 +17,14 @@ func InitAdminUser() error {
 
 	// 如果沒有admin, 則新建一位
 	if adminUser.ID == nil {
+		adminPassword := os.Getenv("ADMIN_PASSWORD")
+		if adminPassword == "" {
+			util.RedLog("should provide admin password")
+		}
+
 		createUserOpts := CreateUserOpts{
 			UserId:   "admin",
-			Password: "password",
+			Password: adminPassword,
 			Name:     "系統使用者",
 			UserType: string(model.UserTypeSystem),
 		}

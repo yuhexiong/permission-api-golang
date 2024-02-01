@@ -19,5 +19,6 @@ type MapUserPermission struct {
 	BaseData      `bson:"inline"`
 	UserOId       *primitive.ObjectID `bson:"userOId" json:"userOId"`                     // 使用者 objectId
 	PermissionOId *primitive.ObjectID `bson:"permissionOId" json:"permissionOId"`         // 權限 objectId
+	Permission    *Permission         `bson:"permission,omitempty" json:"permission"`     // 權限
 	Operations    []PermissionOp      `bson:"operations" json:"operations" example:"W,R"` // 讀或寫
 }

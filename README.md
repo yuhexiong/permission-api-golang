@@ -1,6 +1,6 @@
 # Permission API
 About how to set permissions in a YAML file and read them using Viper, review permissions and update database.  
-Automatically create a system user (username: admin, password: password) with all permissions each time the project is launched.
+Automatically create a system user (username: admin, password: in .env) with all permissions each time the project is launched.
 
 ## Overview
 
@@ -30,6 +30,7 @@ copy .env.default and rename as .env
 MONGO_URL=
 DB_NAME=
 API_PORT=
+ADMIN_PASSWORD=
 JWTKey=
 ```
 
@@ -47,6 +48,7 @@ JWTKey=
 
 ### mapUserPermission 使用者與權限關聯
 - POST /mapUserPermission: 建立使用者與權限關聯（需有權限）
+- POST /mapUserPermission/find: 搜尋使用者與權限關聯（需有權限）
 
 ### permission 權限
 - POST /permission／find: 搜尋所有權限（需有權限）

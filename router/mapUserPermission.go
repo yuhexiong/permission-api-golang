@@ -12,6 +12,7 @@ import (
 
 func InitUserPermissionRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodPost, "/", createUserPermission)
+	RouterPerms(routerGroup, http.MethodPost, "/find", findUserPermission)
 }
 
 func createUserPermission(c *gin.Context) {
@@ -30,4 +31,20 @@ func createUserPermission(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, userPermission)
+}
+
+func findUserPermission(c *gin.Context) {
+	var opts controller.FindUserPermissionOpts
+	if err := c.ShouldBindJSON(&opts); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	userPermissions := []*model.MapUserPermission{}
+	if err := controller.FindUserPermission(opts, &userPermissions); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, userPermissions)
 }
