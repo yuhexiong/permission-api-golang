@@ -17,12 +17,12 @@ const (
 type Task struct {
 	ID           *primitive.ObjectID `bson:"_id,omitempty" json:"_id" example:"623853b9503ce2ecdd221c94"`
 	BaseData     `bson:"inline"`
-	FromUserId   string       `bson:"fromUserId" json:"fromUserId" example:"abd1234"`         // 指派帳號id
-	FromUser     *User        `bson:"fromUser,omitempty" json:"fromUser"`                     // 指派帳號
-	ToUserId     string       `bson:"ToUserId" json:"ToUserId" example:"abd1234"`             // 被指派帳號id
-	ToUser       *User        `bson:"toUser,omitempty" json:"toUser"`                         // 指派帳號
-	Deadline     string       `bson:"deadline" json:"deadline" example:"2024-01-03"`          // 結束日期
-	PriorityType PriorityType `bson:"priorityType" json:"priorityType" example:"HIGH"`        // 任務優先度 HIGH=高, MEDIUM=中, LOW=低
-	Title        string       `bson:"title" json:"title" example:"完成表格"`                      // 標題
-	Content      string       `bson:"content,omitempty" json:"content" example:"將1到10欄的內容補齊"` // 內容
+	FromUserId   *primitive.ObjectID `bson:"fromUserId" json:"fromUserId" example:"abd1234"`         // 指派帳號id
+	FromUser     *User               `bson:"fromUser,omitempty" json:"fromUser"`                     // 指派帳號
+	ToUserId     *primitive.ObjectID `bson:"ToUserId" json:"ToUserId" example:"abd1234"`             // 被指派帳號id
+	ToUser       *User               `bson:"toUser,omitempty" json:"toUser"`                         // 指派帳號
+	Deadline     string              `bson:"deadline" json:"deadline" example:"2024-01-03"`          // 結束日期
+	PriorityType PriorityType        `bson:"priorityType" json:"priorityType" example:"HIGH"`        // 任務優先度 HIGH=高, MEDIUM=中, LOW=低
+	Title        string              `bson:"title" json:"title" example:"完成表格"`                      // 標題
+	Content      string              `bson:"content,omitempty" json:"content" example:"將1到10欄的內容補齊"` // 內容
 }

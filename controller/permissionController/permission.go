@@ -1,7 +1,6 @@
 package permissionController
 
 import (
-	"fmt"
 	"permission-api/model"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -61,7 +60,7 @@ type PermissionDetails struct {
 
 type MapUserPermissionWithDetails struct {
 	model.MapUserPermission `bson:",inline"`
-	PermissionDetails       `bson:",inline"`
+	PermissionDetails       `bson:"permissionDetails,omitempty" json:"permissionDetails" mapstructure:",squash"`
 }
 
 type PermissionInfo struct {
@@ -91,7 +90,7 @@ func GetPermissionInfoByUser(userOId *primitive.ObjectID) (*map[string][]model.P
 
 	permissionOp := make(map[string][]model.PermissionOp)
 	for _, userPermission := range userPermissions {
-		permissionKey := fmt.Sprintf("%s-%s", userPermission.PermissionDetails.Category, userPermission.PermissionDetails.Code)
+		permissionKey := userPermission.Category + "-" + userPermission.Code
 		permissionOp[permissionKey] = userPermission.Operations
 	}
 

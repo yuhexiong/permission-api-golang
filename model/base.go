@@ -4,6 +4,7 @@ import (
 	"context"
 	"permission-api/config"
 	"permission-api/util"
+	"reflect"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -63,7 +64,7 @@ func FindByPipeline(collectionName string, pipeline mongo.Pipeline, result inter
 		return err
 	}
 
-	if result != nil && cursor.Next(context.Background()) {
+	if !isInterfaceValueNil(result) && cursor.Next(context.Background()) {
 		c, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
@@ -99,7 +100,7 @@ func Get(collectionName string, filter interface{}, result interface{}) error {
 		return mongo.ErrNoDocuments
 	}
 
-	if result != nil {
+	if !isInterfaceValueNil(result) {
 		if err := cursor.Decode(result); err != nil {
 			util.RedLog("Get - decode err:  %s", err.Error())
 			return err
@@ -129,11 +130,11 @@ func Insert(collectionName string, rawData interface{}, result interface{}) erro
 		return err
 	}
 
-	if err == nil && insertResult != nil && result == nil {
+	if insertResult != nil && !isInterfaceValueNil(result) {
 		return Get(collectionName, bson.D{{Key: "_id", Value: insertResult.InsertedID}}, result)
 	}
 
-	return nil
+	return err
 }
 
 // 更新
@@ -224,4 +225,9 @@ func Delete(collectionName string, objectId *primitive.ObjectID, forceDelete boo
 	}
 
 	return nil
+}
+
+// 檢驗這個 interface 是不是 nil
+func isInterfaceValueNil(i interface{}) bool {
+	return i == nil || reflect.ValueOf(i).IsNil()
 }
