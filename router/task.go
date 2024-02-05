@@ -13,6 +13,7 @@ import (
 
 func InitTaskRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodPost, "", createTask)
+	RouterPerms(routerGroup, http.MethodPost, "/find", findTask)
 }
 
 func createTask(c *gin.Context) {
@@ -31,4 +32,20 @@ func createTask(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, task)
+}
+
+func findTask(c *gin.Context) {
+	var opts controller.FindTaskOpts
+	if err := c.ShouldBindJSON(&opts); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	tasks := []*model.Task{}
+	if err := controller.FindTask(opts, &tasks); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, tasks)
 }

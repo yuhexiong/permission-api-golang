@@ -17,9 +17,9 @@ const (
 type Task struct {
 	ID           *primitive.ObjectID `bson:"_id,omitempty" json:"_id" example:"623853b9503ce2ecdd221c94"`
 	BaseData     `bson:"inline"`
-	FromUserId   *primitive.ObjectID `bson:"fromUserId" json:"fromUserId" example:"abd1234"`         // 指派帳號id
+	FromUserOId  *primitive.ObjectID `bson:"fromUserOId" json:"fromUserOId" example:"abd1234"`       // 指派帳號id
 	FromUser     *User               `bson:"fromUser,omitempty" json:"fromUser"`                     // 指派帳號
-	ToUserId     *primitive.ObjectID `bson:"ToUserId" json:"ToUserId" example:"abd1234"`             // 被指派帳號id
+	ToUserOId    *primitive.ObjectID `bson:"ToUserOId" json:"ToUserOId" example:"abd1234"`           // 被指派帳號id
 	ToUser       *User               `bson:"toUser,omitempty" json:"toUser"`                         // 指派帳號
 	Deadline     string              `bson:"deadline" json:"deadline" example:"2024-01-03"`          // 結束日期
 	PriorityType PriorityType        `bson:"priorityType" json:"priorityType" example:"HIGH"`        // 任務優先度 HIGH=高, MEDIUM=中, LOW=低
