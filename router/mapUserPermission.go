@@ -8,11 +8,13 @@ import (
 	"permission-api/util"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func InitUserPermissionRouter(routerGroup *gin.RouterGroup) {
-	RouterPerms(routerGroup, http.MethodPost, "/", createUserPermission)
+	RouterPerms(routerGroup, http.MethodPost, "", createUserPermission)
 	RouterPerms(routerGroup, http.MethodPost, "/find", findUserPermission)
+	RouterPerms(routerGroup, http.MethodDelete, "/:id", deleteUserPermission)
 }
 
 func createUserPermission(c *gin.Context) {
@@ -47,4 +49,21 @@ func findUserPermission(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, userPermissions)
+}
+
+func deleteUserPermission(c *gin.Context) {
+	id := c.Param("id")
+
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	if err := controller.DeleteUserPermission(&objectId); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, gin.H{})
 }

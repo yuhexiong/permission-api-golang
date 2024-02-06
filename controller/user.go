@@ -112,11 +112,11 @@ func FindUser(opts FindUserOpts, result *[]*model.User) error {
 }
 
 // 依userOId取得使用者
-func GetUserByUserOId(userOId *primitive.ObjectID, result *model.User) error {
-	return model.Get(model.UserCollName, bson.D{{Key: "_id", Value: userOId}}, &result)
+func GetUserByUserOId(objectId *primitive.ObjectID, result *model.User) error {
+	return model.Get(model.UserCollName, objectId, &result)
 }
 
 // 依userId取得使用者
 func GetUserByUserId(userId string, result *model.User) error {
-	return model.Get(model.UserCollName, bson.D{{Key: "userId", Value: userId}}, &result)
+	return model.GetByFilter(model.UserCollName, bson.D{{Key: "userId", Value: userId}}, &result)
 }

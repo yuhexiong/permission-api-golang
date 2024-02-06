@@ -1,6 +1,7 @@
 # Permission API
-About how to set permissions in a YAML file and read them using Viper, review permissions and update database.  
-Automatically create a system user (username: admin, password: in .env) with all permissions each time the project is launched.
+About how to set permissions in a YAML file and read them using Viper.  
+Automatically Review permissions and update database.  
+And create a system user (username: admin, password: in .env) with all permissions each time the project is launched.
 
 ## Overview
 
@@ -49,9 +50,14 @@ JWTKey=
 ### mapUserPermission 使用者與權限關聯
 - POST /mapUserPermission: 建立使用者與權限關聯（需有權限）
 - POST /mapUserPermission/find: 搜尋使用者與權限關聯（需有權限）
+- DELETE /mapUserPermission: 刪除使用者與權限關聯（需有權限）
 
 ### permission 權限
-- POST /permission／find: 搜尋所有權限（需有權限）
+- POST /permission/find: 搜尋所有權限（需有權限）
+
+### task 任務
+- POST /task: 分派任務（需有權限）
+- POST /task/find: 搜尋所有任務
 
 
 ## Customized Error Code

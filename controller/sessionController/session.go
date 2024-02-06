@@ -42,5 +42,5 @@ func DeleteSessionByUserOId(userOId *primitive.ObjectID) error {
 
 // 由token取得登入憑證
 func GetSessionByToken(token string, result *model.Session) error {
-	return model.Get(model.SessionCollName, bson.D{{Key: "sessionToken", Value: token}}, &result)
+	return model.GetByFilter(model.SessionCollName, bson.D{{Key: "sessionToken", Value: token}}, &result)
 }

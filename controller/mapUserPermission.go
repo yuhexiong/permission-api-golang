@@ -16,12 +16,32 @@ type CreateUserPermissionOpts struct {
 
 // 建立使用者與權限對應關係
 func CreateUserPermission(opts CreateUserPermissionOpts, result *model.MapUserPermission) error {
-	userPermission := model.MapUserPermission{
+	userPermission := model.MapUserPermission{}
+	if err := model.GetByFilter(model.MapUserPermissionCollName,
+		bson.D{{Key: "userOId", Value: opts.UserOId}, {Key: "permissionOId", Value: opts.PermissionOId}},
+		&userPermission); err != nil {
+		return err
+	}
+
+	// 如果已經建立過就更新並啟用
+	if userPermission.ID != nil {
+		if err := model.Update(model.MapUserPermissionCollName,
+			userPermission.ID,
+			bson.D{{Key: "operations", Value: opts.Operations}, {Key: "status", Value: model.NormalStatus}}); err != nil {
+			return err
+		}
+
+		return model.GetByFilter(model.MapUserPermissionCollName,
+			bson.D{{Key: "userOId", Value: opts.UserOId}, {Key: "permissionOId", Value: opts.PermissionOId}},
+			&result)
+	}
+
+	createdUserPermission := model.MapUserPermission{
 		UserOId:       opts.UserOId,
 		PermissionOId: opts.PermissionOId,
 		Operations:    opts.Operations,
 	}
-	return model.Insert(model.MapUserPermissionCollName, &userPermission, result)
+	return model.Insert(model.MapUserPermissionCollName, &createdUserPermission, result)
 }
 
 type FindUserPermissionOpts struct {
@@ -56,6 +76,11 @@ func FindUserPermission(opts FindUserPermissionOpts, result *[]*model.MapUserPer
 }
 
 // 刪除使用者與權限對應關係
-func DeleteUserPermission(userOId *primitive.ObjectID) error {
+func DeleteUserPermission(objectId *primitive.ObjectID) error {
+	return model.Delete(model.MapUserPermissionCollName, objectId, false)
+}
+
+// 刪除特定使用者的使用者與權限對應關係
+func DeleteUserPermissionByUserOId(userOId *primitive.ObjectID) error {
 	return model.DeleteByFilter(model.MapUserPermissionCollName, bson.D{{Key: "userOId", Value: userOId}}, true)
 }

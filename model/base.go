@@ -4,7 +4,6 @@ import (
 	"context"
 	"permission-api/config"
 	"permission-api/util"
-	"reflect"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -64,7 +63,7 @@ func FindByPipeline(collectionName string, pipeline mongo.Pipeline, result inter
 		return err
 	}
 
-	if !isInterfaceValueNil(result) && cursor.Next(context.Background()) {
+	if !util.IsInterfaceValueNil(result) && cursor.Next(context.Background()) {
 		c, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 		defer cancel()
 
@@ -76,8 +75,16 @@ func FindByPipeline(collectionName string, pipeline mongo.Pipeline, result inter
 	return nil
 }
 
+// 依id尋找一位
+func Get(collectionName string, objectId *primitive.ObjectID, result interface{}) error {
+	util.BlueLog("Get(%s) objectId(%+v)", collectionName, objectId)
+
+	filter := bson.D{{Key: "_id", Value: objectId}}
+	return GetByFilter(collectionName, filter, result)
+}
+
 // 尋找一位
-func Get(collectionName string, filter interface{}, result interface{}) error {
+func GetByFilter(collectionName string, filter interface{}, result interface{}) error {
 	util.BlueLog("Get(%s) filter(%+v)", collectionName, filter)
 
 	var pipeline = mongo.Pipeline{}
@@ -100,7 +107,7 @@ func Get(collectionName string, filter interface{}, result interface{}) error {
 		return mongo.ErrNoDocuments
 	}
 
-	if !isInterfaceValueNil(result) {
+	if !util.IsInterfaceValueNil(result) {
 		if err := cursor.Decode(result); err != nil {
 			util.RedLog("Get - decode err:  %s", err.Error())
 			return err
@@ -118,6 +125,7 @@ func Insert(collectionName string, rawData interface{}, result interface{}) erro
 	if err != nil {
 		return err
 	}
+	data["createdAt"] = time.Now()
 	data["updatedAt"] = time.Now()
 	data["status"] = 0 // 預設新增的資料就是啟用的
 
@@ -130,8 +138,8 @@ func Insert(collectionName string, rawData interface{}, result interface{}) erro
 		return err
 	}
 
-	if insertResult != nil && !isInterfaceValueNil(result) {
-		return Get(collectionName, bson.D{{Key: "_id", Value: insertResult.InsertedID}}, result)
+	if insertResult != nil && !util.IsInterfaceValueNil(result) {
+		return GetByFilter(collectionName, bson.D{{Key: "_id", Value: insertResult.InsertedID}}, result)
 	}
 
 	return err
@@ -165,7 +173,7 @@ func Enable(collectionName string, objectId *primitive.ObjectID) error {
 
 	data := bson.M{
 		"updatedAt": time.Now(),
-		"status":    0,
+		"status":    NormalStatus,
 	}
 
 	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -225,9 +233,4 @@ func Delete(collectionName string, objectId *primitive.ObjectID, forceDelete boo
 	}
 
 	return nil
-}
-
-// 檢驗這個 interface 是不是 nil
-func isInterfaceValueNil(i interface{}) bool {
-	return i == nil || reflect.ValueOf(i).IsNil()
 }

@@ -36,7 +36,7 @@ func InitAdminUser() error {
 	}
 
 	// 刪除 admin 的所有權限
-	DeleteUserPermission(adminUser.ID)
+	DeleteUserPermissionByUserOId(adminUser.ID)
 
 	// 取得目前有的權限
 	permissions := []*model.Permission{}
