@@ -23,6 +23,17 @@ go run main.go
 
 ## Permission
 copy etc/apiPermission.yaml.default and rename as etc/apiPermission.yaml to restrict api access rights.   
+```
+PermissionDefs:
+  ChangePassword:
+    Category: "PASSWORD"
+    Code: "changePassword"
+
+APIToPermission:
+  - Url: "/user/:userId/password"
+    Methods: "PATCH"
+    PermissionName: "ChangePassword"
+```
 
 
 ### ENV

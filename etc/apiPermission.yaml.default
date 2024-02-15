@@ -1,0 +1,51 @@
+PermissionDefs:
+  ChangePassword:
+    Category: "PASSWORD"
+    Code: "changePassword"
+  CreateUser:
+    Category: "USER"
+    Code: "createUser"
+  CreateSystemUser: # 寫於api中
+    Category: "USER"
+    Code: "createSystemUser"
+  CreateUserPermission:
+    Category: "USER-PERMISSION"
+    Code: "createMapUserPermission"
+  FindUserPermission:
+    Category: "USER-PERMISSION"
+    Code: "findUserPermission"
+  FindPermission:
+    Category: "PERMISSION"
+    Code: "findPermission"
+  CreateTask:
+    Category: "TASK"
+    Code: "createTask"
+
+APIToPermission:
+  - Url: "/user/:userId/password"
+    Methods: "PATCH"
+    PermissionName: "ChangePassword"
+  - Url: "/user"
+    Methods: "POST"
+    PermissionName: "CreateUser"
+    PermissionOp: "W"
+  - Url: "/userPermission"
+    Methods: "POST"
+    PermissionName: "CreateUserPermission"
+    PermissionOp: "W"
+  - Url: "/userPermission/find"
+    Methods: "POST"
+    PermissionName: "FindUserPermission"
+    PermissionOp: "R"
+  - Url: "/userPermission/:id"
+    Methods: "DELETE"
+    PermissionName: "CreateUserPermission"
+    PermissionOp: "W"
+  - Url: "/permission/find"
+    Methods: "POST"
+    PermissionName: "FindPermission"
+    PermissionOp: "R"
+  - Url: "/task"
+    Methods: "POST"
+    PermissionName: "CreateTask"
+    PermissionOp: "W"
