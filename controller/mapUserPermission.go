@@ -20,28 +20,23 @@ func CreateUserPermission(opts CreateUserPermissionOpts, result *model.MapUserPe
 	if err := model.GetByFilter(model.MapUserPermissionCollName,
 		bson.D{{Key: "userOId", Value: opts.UserOId}, {Key: "permissionOId", Value: opts.PermissionOId}},
 		&userPermission); err != nil {
-		return err
-	}
-
-	// 如果已經建立過就更新並啟用
-	if userPermission.ID != nil {
-		if err := model.Update(model.MapUserPermissionCollName,
-			userPermission.ID,
-			bson.D{{Key: "operations", Value: opts.Operations}, {Key: "status", Value: model.NormalStatus}}); err != nil {
-			return err
+		// 沒有權限就新增
+		if err == mongo.ErrNoDocuments {
+			createdUserPermission := model.MapUserPermission{
+				UserOId:       opts.UserOId,
+				PermissionOId: opts.PermissionOId,
+				Operations:    opts.Operations,
+			}
+			return model.Insert(model.MapUserPermissionCollName, &createdUserPermission, result)
 		}
 
-		return model.GetByFilter(model.MapUserPermissionCollName,
-			bson.D{{Key: "userOId", Value: opts.UserOId}, {Key: "permissionOId", Value: opts.PermissionOId}},
-			&result)
+		return err
+	} else {
+		// 有權限就就更新並啟用
+		return model.Update(model.MapUserPermissionCollName,
+			userPermission.ID,
+			bson.D{{Key: "operations", Value: opts.Operations}, {Key: "status", Value: model.NormalStatus}})
 	}
-
-	createdUserPermission := model.MapUserPermission{
-		UserOId:       opts.UserOId,
-		PermissionOId: opts.PermissionOId,
-		Operations:    opts.Operations,
-	}
-	return model.Insert(model.MapUserPermissionCollName, &createdUserPermission, result)
 }
 
 type FindUserPermissionOpts struct {

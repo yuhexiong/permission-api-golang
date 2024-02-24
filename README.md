@@ -69,6 +69,7 @@ JWTKey=
 ### task 任務
 - POST /task: 分派任務（需有權限）
 - POST /task/find: 搜尋所有任務
+- PATCH /task/:id/:checked: 驗收/驗收失敗任務（需有權限/需視原先指派者）
 
 
 ## Customized Error Code

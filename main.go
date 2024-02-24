@@ -35,6 +35,7 @@ func main() {
 		panic(err)
 	}
 
+	util.GreenLog("Server run at port: %d", apiPort)
 	server := &http.Server{
 		Addr:           fmt.Sprintf(":%d", apiPort),
 		Handler:        router,
@@ -46,5 +47,4 @@ func main() {
 	if err := server.ListenAndServe(); err != nil {
 		util.RedLog("Server error:", err)
 	}
-	util.GreenLog("Server run at port:", apiPort)
 }

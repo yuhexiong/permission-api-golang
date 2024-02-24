@@ -49,3 +49,7 @@ APIToPermission:
     Methods: "POST"
     PermissionName: "CreateTask"
     PermissionOp: "W"
+  - Url: "/task/:id/:checked"
+    Methods: "PATCH"
+    PermissionName: "CreateTask"
+    PermissionOp: "W"

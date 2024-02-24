@@ -25,4 +25,5 @@ type Task struct {
 	PriorityType PriorityType        `bson:"priorityType" json:"priorityType" example:"HIGH"`        // 任務優先度 HIGH=高, MEDIUM=中, LOW=低
 	Title        string              `bson:"title" json:"title" example:"完成表格"`                      // 標題
 	Content      string              `bson:"content,omitempty" json:"content" example:"將1到10欄的內容補齊"` // 內容
+	Checked      *bool               `bson:"checked,omitempty" json:"checked" example:"true"`        // 驗收
 }

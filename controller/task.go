@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"errors"
 	"permission-api/model"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -52,4 +53,21 @@ func FindTask(opts FindTaskOpts, result *[]*model.Task) error {
 	}
 
 	return model.Find(model.TaskCollName, filter, result)
+}
+
+// 更新任務驗收
+func CheckTask(objectId *primitive.ObjectID, userOId *primitive.ObjectID, checked *bool) error {
+	task := model.Task{}
+	if err := model.Get(model.TaskCollName, objectId, &task); err != nil {
+		return errors.New("task not found")
+	}
+
+	if *task.FromUserOId != *userOId {
+		return errors.New("task not created by this user")
+	}
+
+	return model.Update(
+		model.TaskCollName,
+		objectId,
+		bson.D{{Key: "checked", Value: *checked}})
 }

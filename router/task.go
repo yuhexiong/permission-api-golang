@@ -7,13 +7,16 @@ import (
 	"permission-api/model"
 	"permission-api/response"
 	"permission-api/util"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 func InitTaskRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodPost, "", createTask)
 	RouterPerms(routerGroup, http.MethodPost, "/find", findTask)
+	RouterPerms(routerGroup, http.MethodPatch, "/:id/:checked", checkTask)
 }
 
 func createTask(c *gin.Context) {
@@ -48,4 +51,29 @@ func findTask(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, tasks)
+}
+
+func checkTask(c *gin.Context) {
+	id := c.Param("id")
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	checkedStr := c.Param("checked")
+	checked, err := strconv.ParseBool(checkedStr)
+	if err != nil {
+		response.AbortError(c, util.InvalidParameterError("checked should be boolean"))
+		return
+	}
+
+	userOId := middleware.GetUserOId(c)
+
+	if err := controller.CheckTask(&objectId, userOId, &checked); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, gin.H{})
 }

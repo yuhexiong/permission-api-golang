@@ -10,7 +10,7 @@ import (
 	"permission-api/util"
 )
 
-func InitAdminUser() error {
+func InitAdminUser() {
 	// 建立系統使用者
 	adminUser := model.User{}
 	GetUserByUserId("admin", &adminUser)
@@ -31,7 +31,7 @@ func InitAdminUser() error {
 
 		err := CreateUser(createUserOpts, &adminUser)
 		if err != nil {
-			return err
+			panic(err)
 		}
 	}
 
@@ -41,7 +41,7 @@ func InitAdminUser() error {
 	// 取得目前有的權限
 	permissions := []*model.Permission{}
 	if err := permissionController.FindPermission(permissionController.FindPermissionOpts{}, &permissions); err != nil {
-		return err
+		panic(err)
 	}
 
 	// 賦予系統使用者所有權限
@@ -52,11 +52,9 @@ func InitAdminUser() error {
 			Operations:    []model.PermissionOp{model.READ, model.WRITE},
 		}
 		if err := CreateUserPermission(createUserPermission, nil); err != nil {
-			return err
+			panic(err)
 		}
 	}
-
-	return nil
 }
 
 type LoginOpts struct {

@@ -1,4 +1,4 @@
-package validators
+package validator
 
 import (
 	"permission-api/model"
@@ -10,7 +10,10 @@ import (
 
 func InitValidator() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
-		v.RegisterValidation("permissionOp", OperationsValidation)
+		if err := v.RegisterValidation("permissionOp", OperationsValidation); err != nil {
+			util.RedLog("init permissionOp validator error")
+		}
+
 	} else {
 		util.RedLog("init validator error")
 	}
