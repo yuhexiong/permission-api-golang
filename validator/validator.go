@@ -10,6 +10,9 @@ import (
 
 func InitValidator() {
 	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		if err := v.RegisterValidation("userType", UserTypeValidation); err != nil {
+			util.RedLog("init userType validator error")
+		}
 		if err := v.RegisterValidation("permissionOp", OperationsValidation); err != nil {
 			util.RedLog("init permissionOp validator error")
 		}
@@ -17,6 +20,23 @@ func InitValidator() {
 	} else {
 		util.RedLog("init validator error")
 	}
+}
+
+func UserTypeValidation(fl validator.FieldLevel) bool {
+	userType := fl.Field().Interface().(model.UserType)
+
+	switch userType {
+	case
+		model.UserTypeManager,
+		model.UserTypeEmployee,
+		model.UserTypeOther,
+		model.UserTypeSystem:
+		break
+	default:
+		return false
+	}
+
+	return true
 }
 
 func OperationsValidation(fl validator.FieldLevel) bool {

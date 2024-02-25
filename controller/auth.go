@@ -26,7 +26,7 @@ func InitAdminUser() {
 			UserId:   "admin",
 			Password: adminPassword,
 			Name:     "系統使用者",
-			UserType: string(model.UserTypeSystem),
+			UserType: model.UserTypeSystem,
 		}
 
 		err := CreateUser(createUserOpts, &adminUser)
