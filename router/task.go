@@ -17,6 +17,7 @@ func InitTaskRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodPost, "", createTask)
 	RouterPerms(routerGroup, http.MethodPost, "/find", findTask)
 	RouterPerms(routerGroup, http.MethodPatch, "/:id/:checked", checkTask)
+	RouterPerms(routerGroup, http.MethodDelete, "/:id", deleteTask)
 }
 
 func createTask(c *gin.Context) {
@@ -71,6 +72,24 @@ func checkTask(c *gin.Context) {
 	userOId := middleware.GetUserOId(c)
 
 	if err := controller.CheckTask(&objectId, userOId, &checked); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, gin.H{})
+}
+
+func deleteTask(c *gin.Context) {
+	id := c.Param("id")
+	objectId, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	userOId := middleware.GetUserOId(c)
+
+	if err := controller.DeleteTask(&objectId, userOId); err != nil {
 		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}

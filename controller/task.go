@@ -71,3 +71,20 @@ func CheckTask(objectId *primitive.ObjectID, userOId *primitive.ObjectID, checke
 		objectId,
 		bson.D{{Key: "checked", Value: *checked}})
 }
+
+// 刪除任務
+func DeleteTask(objectId *primitive.ObjectID, userOId *primitive.ObjectID) error {
+	task := model.Task{}
+	if err := model.Get(model.TaskCollName, objectId, &task); err != nil {
+		return errors.New("task not found")
+	}
+
+	if *task.FromUserOId != *userOId {
+		return errors.New("task not created by this user")
+	}
+
+	return model.Delete(
+		model.TaskCollName,
+		objectId,
+		false)
+}

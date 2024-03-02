@@ -20,6 +20,9 @@ PermissionDefs:
   CreateTask:
     Category: "TASK"
     Code: "createTask"
+  FindTask:
+    Category: "TASK"
+    Code: "findTask"
 
 APIToPermission:
   - Url: "/user/:userId/password"
@@ -49,7 +52,15 @@ APIToPermission:
     Methods: "POST"
     PermissionName: "CreateTask"
     PermissionOp: "W"
+  - Url: "/task/find"
+    Methods: "POST"
+    PermissionName: "FindTask"
+    PermissionOp: "R"
   - Url: "/task/:id/:checked"
     Methods: "PATCH"
+    PermissionName: "CreateTask"
+    PermissionOp: "W"
+  - Url: "/task/:id"
+    Methods: "DELETE"
     PermissionName: "CreateTask"
     PermissionOp: "W"
