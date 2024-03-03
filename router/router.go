@@ -21,7 +21,9 @@ func InitRouter() *gin.Engine {
 	routerWithAuth.Use(middleware.AuthorizeToken)
 
 	// auth 不需驗證 token
-	InitAuthRouter(router.Group("/auth"))
+	InitUnAuthRouter(router.Group("/auth"))
+	// auth 需驗證 token
+	InitAuthRouter(routerWithAuth.Group("/auth"))
 
 	// 其餘需驗證 token
 	InitUserRouter(routerWithAuth.Group("/user"))

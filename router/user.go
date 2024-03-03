@@ -15,28 +15,10 @@ import (
 )
 
 func InitUserRouter(routerGroup *gin.RouterGroup) {
-	RouterPerms(routerGroup, http.MethodPost, "/logout", logout)
 	RouterPerms(routerGroup, http.MethodPatch, "/myPassword", resetPassword)
 	RouterPerms(routerGroup, http.MethodPatch, "/:userId/password", changePassword)
 	RouterPerms(routerGroup, http.MethodPost, "", createUser)
 	RouterPerms(routerGroup, http.MethodPost, "/find", findUser)
-}
-
-func logout(c *gin.Context) {
-	userOId := middleware.GetUserOId(c)
-	// 取得使用者
-	user := model.User{}
-	if err := controller.GetUserByUserOId(userOId, &user); err != nil {
-		response.AbortError(c, util.UserNotFoundError(err.Error()))
-		return
-	}
-
-	// 系統使用者永遠不登出
-	if user.UserType != model.UserTypeSystem {
-		sessionController.DeleteSessionByUserOId(userOId)
-	}
-
-	response.SuccessFormat(c, gin.H{})
 }
 
 func resetPassword(c *gin.Context) {

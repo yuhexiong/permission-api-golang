@@ -48,11 +48,11 @@ JWTKey=
 
 ## API
 
-### auth 權限（不需要登入）
-- POST /auth/login: 登入
+### auth 權限
+- POST /auth/login: 登入（不需要帶token）
+- POST /auth/logout: 登出
 
 ### user 使用者
-- POST /user/logout: 登出
 - PATCH /user/myPassword: 修改自己的密碼
 - PATCH /user/{userId}/password: 修改別人的密碼（需有權限）
 - POST /user: 建立使用者（需有權限）
@@ -69,10 +69,11 @@ JWTKey=
 ### task 任務
 - POST /task: 分派任務（需有權限）
 - POST /task/find: 搜尋所有任務
-- PATCH /task/:id/:checked: 驗收/驗收失敗任務（需有權限/需視原先指派者）
-- DELETE /task/:id: 刪除任務（需有權限/需視原先指派者）
+- PATCH /task/{id}/{checked}: 驗收/驗收失敗任務（需有權限/需視原先指派者）
+- DELETE /task/{id}: 刪除任務（需有權限/需視原先指派者）
 
 ## Customized Error Code
+- InternalServerError: 000001
 - InvalidTokenError: 000002
 - WrongPasswordError: 000003
 - UserNotFoundError: 000004
