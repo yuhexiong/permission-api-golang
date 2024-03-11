@@ -14,6 +14,13 @@ const (
 	PriorityTypeLow    PriorityType = "LOW"
 )
 
+type ProgressType string
+
+const TODO ProgressType = "TODO"
+const DOING ProgressType = "DOING"
+const TEST ProgressType = "TEST"
+const DONE ProgressType = "DONE"
+
 type Task struct {
 	ID           *primitive.ObjectID `bson:"_id,omitempty" json:"_id" example:"623853b9503ce2ecdd221c94"`
 	BaseData     `bson:"inline"`
@@ -21,6 +28,7 @@ type Task struct {
 	FromUser     *User               `bson:"fromUser,omitempty" json:"fromUser"`                     // 指派帳號
 	ToUserOId    *primitive.ObjectID `bson:"ToUserOId" json:"ToUserOId" example:"abd1234"`           // 被指派帳號id
 	ToUser       *User               `bson:"toUser,omitempty" json:"toUser"`                         // 指派帳號
+	ProgressType ProgressType        `bson:"progressType" json:"progressType" example:"TODO"`        // 任務完成度 TODO, DOING, TEST, DONE
 	Deadline     string              `bson:"deadline" json:"deadline" example:"2024-01-03"`          // 結束日期
 	PriorityType PriorityType        `bson:"priorityType" json:"priorityType" example:"HIGH"`        // 任務優先度 HIGH=高, MEDIUM=中, LOW=低
 	Title        string              `bson:"title" json:"title" example:"完成表格"`                      // 標題
