@@ -2,7 +2,6 @@ package router
 
 import (
 	"permission-api/middleware"
-	"permission-api/validator"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -13,9 +12,6 @@ func InitRouter() *gin.Engine {
 	router.Use(cors.New(corsConfig()))
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
-
-	// validator
-	validator.InitValidator()
 
 	routerWithAuth := router.Group("")
 	routerWithAuth.Use(middleware.AuthorizeToken)

@@ -20,6 +20,7 @@ const TODO ProgressType = "TODO"
 const DOING ProgressType = "DOING"
 const TEST ProgressType = "TEST"
 const DONE ProgressType = "DONE"
+const DELETE ProgressType = "DELETE"
 
 type Task struct {
 	ID           *primitive.ObjectID `bson:"_id,omitempty" json:"_id" example:"623853b9503ce2ecdd221c94"`

@@ -62,10 +62,10 @@ func ChangePassword(user *model.User, password string) (bool, error) {
 }
 
 type CreateUserOpts struct {
-	UserId   string         `json:"userId" binding:"required" example:"admin"`            // 帳號
-	Password string         `json:"password" binding:"required" example:"Abc12345678"`    // 密碼
-	Name     string         `json:"name" binding:"required" example:"系統使用者"`              // 姓名
-	UserType model.UserType `json:"userType" binding:"required,userType" example:"OTHER"` // 使用者類別 MANAGER=管理層, EMPLOYEE=員工, OTHER=其他, SYSTEM=系統
+	UserId   string         `json:"userId" binding:"required" example:"admin"`         // 帳號
+	Password string         `json:"password" binding:"required" example:"Abc12345678"` // 密碼
+	Name     string         `json:"name" binding:"required" example:"系統使用者"`           // 姓名
+	UserType model.UserType `json:"userType" binding:"required" example:"OTHER"`       // 使用者類別 MANAGER=管理層, EMPLOYEE=員工, OTHER=其他, SYSTEM=系統
 }
 
 // 建立使用者
@@ -87,9 +87,9 @@ func CreateUser(opts CreateUserOpts, result *model.User) error {
 }
 
 type FindUserOpts struct {
-	UserId   *string         `json:"userId" example:"admin"`                      // 帳號(支援正規表達式)
-	Name     *string         `json:"name" example:"系統使用者"`                        // 姓名(支援正規表達式)
-	UserType *model.UserType `json:"userType" binding:"userType" example:"OTHER"` // 使用者類別 MANAGER=管理層, EMPLOYEE=員工, OTHER=其他, SYSTEM=系統
+	UserId   *string         `json:"userId" example:"admin"`    // 帳號(支援正規表達式)
+	Name     *string         `json:"name" example:"系統使用者"`      // 姓名(支援正規表達式)
+	UserType *model.UserType `json:"userType"  example:"OTHER"` // 使用者類別 MANAGER=管理層, EMPLOYEE=員工, OTHER=其他, SYSTEM=系統
 }
 
 // 搜尋使用者
