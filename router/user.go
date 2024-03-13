@@ -48,28 +48,35 @@ func resetPassword(c *gin.Context) {
 	response.SuccessFormat(c, gin.H{})
 }
 
-type ChangePasswordOpts struct {
+type changePasswordReqParm struct {
+	UserId string `uri:"userId" binding:"required"`
+}
+
+type changePasswordReqBody struct {
 	Password string `json:"password" binding:"required"` // 密碼
 }
 
 func changePassword(c *gin.Context) {
-	userId := c.Param("userId")
+	var params changePasswordReqParm
+	if err := c.ShouldBindUri(&params); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
 
-	var changePasswordOpts ChangePasswordOpts
-
-	if err := c.ShouldBindJSON(&changePasswordOpts); err != nil {
+	var changePasswordBody changePasswordReqBody
+	if err := c.ShouldBindJSON(&changePasswordBody); err != nil {
 		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}
 
 	// 取得被更新使用者
 	user := model.User{}
-	if err := controller.GetUserByUserId(userId, &user); err != nil {
+	if err := controller.GetUserByUserId(params.UserId, &user); err != nil {
 		response.AbortError(c, util.UserNotFoundError(err.Error()))
 		return
 	}
 
-	if ok, err := controller.ChangePassword(&user, changePasswordOpts.Password); !ok || err != nil {
+	if ok, err := controller.ChangePassword(&user, changePasswordBody.Password); !ok || err != nil {
 		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}

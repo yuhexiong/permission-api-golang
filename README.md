@@ -61,7 +61,7 @@ JWTKey=
 ### mapUserPermission 使用者與權限關聯
 - POST /mapUserPermission: 建立使用者與權限關聯（需有權限）
 - POST /mapUserPermission/find: 搜尋使用者與權限關聯（需有權限）
-- DELETE /mapUserPermission: 刪除使用者與權限關聯（需有權限）
+- DELETE /mapUserPermission/{id}: 刪除使用者與權限關聯（需有權限）
 
 ### permission 權限
 - POST /permission/find: 搜尋所有權限（需有權限）
@@ -69,7 +69,7 @@ JWTKey=
 ### task 任務
 - POST /task: 分派任務（需有權限）
 - POST /task/find: 搜尋所有任務
-- PATCH /task/{id}/{checked}: 驗收/驗收失敗任務（需有權限/需視原先指派者）
+- PATCH /task/{id}/checked/{checked}: 驗收/驗收失敗任務（需有權限/需視原先指派者）
 - DELETE /task/{id}: 刪除任務（需有權限/需視原先指派者）
 
 ## Customized Error Code

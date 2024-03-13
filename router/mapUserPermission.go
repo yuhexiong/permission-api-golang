@@ -51,10 +51,18 @@ func findUserPermission(c *gin.Context) {
 	response.SuccessFormat(c, userPermissions)
 }
 
-func deleteUserPermission(c *gin.Context) {
-	id := c.Param("id")
+type deleteUserPermissionReqParm struct {
+	ID string `uri:"id" binding:"required"`
+}
 
-	objectId, err := primitive.ObjectIDFromHex(id)
+func deleteUserPermission(c *gin.Context) {
+	var params deleteUserPermissionReqParm
+	if err := c.ShouldBindUri(&params); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(params.ID)
 	if err != nil {
 		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return

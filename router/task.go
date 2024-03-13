@@ -7,7 +7,6 @@ import (
 	"permission-api/model"
 	"permission-api/response"
 	"permission-api/util"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,7 +15,7 @@ import (
 func InitTaskRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodPost, "", createTask)
 	RouterPerms(routerGroup, http.MethodPost, "/find", findTask)
-	RouterPerms(routerGroup, http.MethodPatch, "/:id/:checked", checkTask)
+	RouterPerms(routerGroup, http.MethodPatch, "/:id/checked/:checked", checkTask)
 	RouterPerms(routerGroup, http.MethodDelete, "/:id", deleteTask)
 }
 
@@ -54,24 +53,27 @@ func findTask(c *gin.Context) {
 	response.SuccessFormat(c, tasks)
 }
 
+type checkedTaskReqParm struct {
+	ID      string `uri:"id" binding:"required"`
+	Checked bool   `uri:"checked" binding:"required"`
+}
+
 func checkTask(c *gin.Context) {
-	id := c.Param("id")
-	objectId, err := primitive.ObjectIDFromHex(id)
+	var params checkedTaskReqParm
+	if err := c.ShouldBindUri(&params); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(params.ID)
 	if err != nil {
 		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}
 
-	checkedStr := c.Param("checked")
-	checked, err := strconv.ParseBool(checkedStr)
-	if err != nil {
-		response.AbortError(c, util.InvalidParameterError("checked should be boolean"))
-		return
-	}
-
 	userOId := middleware.GetUserOId(c)
 
-	if err := controller.CheckTask(&objectId, userOId, &checked); err != nil {
+	if err := controller.CheckTask(&objectId, userOId, &params.Checked); err != nil {
 		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}
@@ -79,9 +81,18 @@ func checkTask(c *gin.Context) {
 	response.SuccessFormat(c, gin.H{})
 }
 
+type deleteTaskReqParm struct {
+	ID string `uri:"id" binding:"required"`
+}
+
 func deleteTask(c *gin.Context) {
-	id := c.Param("id")
-	objectId, err := primitive.ObjectIDFromHex(id)
+	var params deleteTaskReqParm
+	if err := c.ShouldBindUri(&params); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(params.ID)
 	if err != nil {
 		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
