@@ -55,6 +55,31 @@ func FindTask(opts FindTaskOpts, result *[]*model.Task) error {
 	return model.Find(model.TaskCollName, filter, result)
 }
 
+// 更新任務進度
+func UpdateTaskProgressType(objectId *primitive.ObjectID, userOId *primitive.ObjectID, progressType *model.ProgressType) error {
+	task := model.Task{}
+	if err := model.Get(model.TaskCollName, objectId, &task); err != nil {
+		return errors.New("task not found")
+	}
+
+	if *task.ToUserOId != *userOId && *task.FromUserOId != *userOId {
+		return errors.New("task not assigned to this user or created by this user")
+	}
+
+	if *progressType == model.DONE && (task.Checked == nil || !*task.Checked) {
+		return errors.New("task cannot be moved to DONE before checked")
+	}
+
+	if *progressType == model.DELETE && *task.FromUserOId != *userOId {
+		return errors.New("only creator can delete the task")
+	}
+
+	return model.Update(
+		model.TaskCollName,
+		objectId,
+		bson.D{{Key: "progressType", Value: *progressType}})
+}
+
 // 更新任務驗收
 func CheckTask(objectId *primitive.ObjectID, userOId *primitive.ObjectID, checked *bool) error {
 	task := model.Task{}

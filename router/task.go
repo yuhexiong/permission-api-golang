@@ -15,6 +15,7 @@ import (
 func InitTaskRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodPost, "", createTask)
 	RouterPerms(routerGroup, http.MethodPost, "/find", findTask)
+	RouterPerms(routerGroup, http.MethodPatch, "/:id/progressType/:progressType", updateTaskProgress)
 	RouterPerms(routerGroup, http.MethodPatch, "/:id/checked/:checked", checkTask)
 	RouterPerms(routerGroup, http.MethodDelete, "/:id", deleteTask)
 }
@@ -51,6 +52,34 @@ func findTask(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, tasks)
+}
+
+type updateTaskProgressReqParm struct {
+	ID           string             `uri:"id" binding:"required"`
+	ProgressType model.ProgressType `uri:"progressType" binding:"required" example:"TODO"` // 任務完成度 TODO, DOING, TEST, DONE
+}
+
+func updateTaskProgress(c *gin.Context) {
+	var params updateTaskProgressReqParm
+	if err := c.ShouldBindUri(&params); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	objectId, err := primitive.ObjectIDFromHex(params.ID)
+	if err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	userOId := middleware.GetUserOId(c)
+
+	if err := controller.UpdateTaskProgressType(&objectId, userOId, &params.ProgressType); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, gin.H{})
 }
 
 type checkedTaskReqParm struct {
