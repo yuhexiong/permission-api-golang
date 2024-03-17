@@ -10,13 +10,13 @@ And create a system user (username: admin, password: in .env) with all permissio
 - MongoDB v7.0.2
 
 
-### 更新 Modules
+### Update Modules
 ```
 go get -u && go mod tidy -v
 ```
 
 
-### 執行程式
+### Run
 ```
 go run main.go
 ```
