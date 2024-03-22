@@ -9,6 +9,7 @@ And create a system user (username: admin, password: in .env) with all permissio
 - Web FrameWork: Gin v1.9.1
 - MongoDB v7.0.2
 
+## Run
 
 ### Update Modules
 ```
@@ -20,6 +21,7 @@ go get -u && go mod tidy -v
 ```
 go run main.go
 ```
+
 
 ## Permission
 copy etc/apiPermission.yaml.default and rename as etc/apiPermission.yaml to restrict api access rights.   
