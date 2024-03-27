@@ -2,6 +2,7 @@ package controller
 
 import (
 	"errors"
+	"fmt"
 	"permission-api/model"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -59,7 +60,7 @@ func FindTask(opts FindTaskOpts, result *[]*model.Task) error {
 func UpdateTaskProgressType(objectId *primitive.ObjectID, userOId *primitive.ObjectID, progressType *model.ProgressType) error {
 	task := model.Task{}
 	if err := model.Get(model.TaskCollName, objectId, &task); err != nil {
-		return errors.New("task not found")
+		return err
 	}
 
 	if *task.ToUserOId != *userOId && *task.FromUserOId != *userOId {
@@ -74,42 +75,61 @@ func UpdateTaskProgressType(objectId *primitive.ObjectID, userOId *primitive.Obj
 		return errors.New("only creator can delete the task")
 	}
 
-	return model.Update(
-		model.TaskCollName,
-		objectId,
-		bson.D{{Key: "progressType", Value: *progressType}})
+	if err := model.Update(model.TaskCollName, objectId, bson.D{{Key: "progressType", Value: *progressType}}); err != nil {
+		return err
+	}
+
+	// 如果移到測試, 就新增通知給指派者確認驗收
+	if *progressType == model.TEST {
+		err := createNotification(createNotificationOpts{
+			ToUserOId: task.FromUserOId,
+			Content:   fmt.Sprintf("Task '%s' has been completed and is ready for checking.", task.Title),
+		}, nil)
+
+		return err
+	}
+
+	return nil
 }
 
 // 更新任務驗收
 func CheckTask(objectId *primitive.ObjectID, userOId *primitive.ObjectID, checked *bool) error {
 	task := model.Task{}
 	if err := model.Get(model.TaskCollName, objectId, &task); err != nil {
-		return errors.New("task not found")
+		return err
 	}
 
 	if *task.FromUserOId != *userOId {
 		return errors.New("task not created by this user")
 	}
 
-	return model.Update(
-		model.TaskCollName,
-		objectId,
-		bson.D{{Key: "checked", Value: *checked}})
+	if err := model.Update(model.TaskCollName, objectId, bson.D{{Key: "checked", Value: *checked}}); err != nil {
+		return err
+	}
+
+	// 如果驗收完成, 通知被指派者已完成
+	if *checked {
+		err := createNotification(createNotificationOpts{
+			ToUserOId: task.ToUserOId,
+			Content:   fmt.Sprintf("Task '%s' has been checked successfully.", task.Title),
+		}, nil)
+
+		return err
+	}
+
+	return nil
 }
 
 // 刪除任務
 func DeleteTask(objectId *primitive.ObjectID, userOId *primitive.ObjectID) error {
 	task := model.Task{}
 	if err := model.Get(model.TaskCollName, objectId, &task); err != nil {
-		return errors.New("task not found")
+		return err
 	}
 
 	if *task.FromUserOId != *userOId {
 		return errors.New("task not created by this user")
 	}
 
-	return model.Delete(
-		model.TaskCollName,
-		objectId,
-		false)
+	return model.Delete(model.TaskCollName, objectId, false)
 }
