@@ -1,8 +1,10 @@
 package controller
 
 import (
+	"errors"
 	"permission-api/model"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
@@ -18,4 +20,18 @@ func createNotification(opts createNotificationOpts, result *model.Notification)
 		Content:   opts.Content,
 	}
 	return model.Insert(model.NotificationCollName, createdNotification, result)
+}
+
+// 已讀通知
+func ReadNotification(objectId *primitive.ObjectID, userOId *primitive.ObjectID) error {
+	notification := model.Notification{}
+	if err := model.Get(model.NotificationCollName, objectId, &notification); err != nil {
+		return err
+	}
+
+	if *notification.ToUserOId != *userOId {
+		return errors.New("notification not sent to this user")
+	}
+
+	return model.Update(model.NotificationCollName, objectId, bson.D{{Key: "read", Value: true}})
 }

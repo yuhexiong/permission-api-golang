@@ -26,6 +26,7 @@ func InitRouter() *gin.Engine {
 	InitPermissionRouter(routerWithAuth.Group("/permission"))
 	InitUserPermissionRouter(routerWithAuth.Group("/userPermission"))
 	InitTaskRouter(routerWithAuth.Group("/task"))
+	InitNotificationRouter(routerWithAuth.Group("/notification"))
 
 	return router
 }

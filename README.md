@@ -71,9 +71,12 @@ JWTKey=
 ### task 任務
 - POST /task: 分派任務（需有權限）
 - POST /task/find: 搜尋所有任務
-- PATCH /task/{id}/progressType/{progressType}: 更新任務進度（需為原先指派者或被指派者/DONE前須驗收完畢/DELETE需為原先指派者）
-- PATCH /task/{id}/checked/{checked}: 驗收/驗收失敗任務（需有權限/需為原先指派者）
+- PATCH /task/{id}/progressType/{progressType}: 更新任務進度（需為原先指派者或被指派者/DONE前須驗收完畢/DELETE需為原先指派者）, 移致測試會發送通知原先指派者驗收
+- PATCH /task/{id}/checked/{checked}: 驗收/驗收失敗任務（需有權限/需為原先指派者）, 驗收成功會發送通知給被指派者
 - DELETE /task/{id}: 刪除任務（需有權限/需為原先指派者）
+
+### notification 通知
+- PATCH /notification/{id}/read: 已讀通知（需為被發送者）
 
 ## Customized Error Code
 - InternalServerError: 000001
