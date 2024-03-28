@@ -13,6 +13,7 @@ import (
 
 func InitNotificationRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodPatch, "/:id/read", readNotification)
+	RouterPerms(routerGroup, http.MethodPatch, "/read/all", readAllNotification)
 }
 
 type readNotificationReqParm struct {
@@ -35,6 +36,17 @@ func readNotification(c *gin.Context) {
 	userOId := middleware.GetUserOId(c)
 
 	if err := controller.ReadNotification(&objectId, userOId); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, gin.H{})
+}
+
+func readAllNotification(c *gin.Context) {
+	userOId := middleware.GetUserOId(c)
+
+	if err := controller.ReadAllNotification(userOId); err != nil {
 		response.AbortError(c, util.InvalidParameterError(err.Error()))
 		return
 	}

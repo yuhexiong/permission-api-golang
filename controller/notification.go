@@ -9,7 +9,7 @@ import (
 )
 
 type createNotificationOpts struct {
-	ToUserOId *primitive.ObjectID `bson:"ToUserOId" json:"ToUserOId" binding:"required" example:"abd1234"` // 接收者帳號id
+	ToUserOId *primitive.ObjectID `bson:"toUserOId" json:"toUserOId" binding:"required" example:"abd1234"` // 接收者帳號id
 	Content   string              `bson:"content" json:"content" binding:"required" example:"您有一個新的任務"`    // 通知內容
 }
 
@@ -34,4 +34,9 @@ func ReadNotification(objectId *primitive.ObjectID, userOId *primitive.ObjectID)
 	}
 
 	return model.Update(model.NotificationCollName, objectId, bson.D{{Key: "read", Value: true}})
+}
+
+// 已讀所有通知
+func ReadAllNotification(userOId *primitive.ObjectID) error {
+	return model.UpdateByFilter(model.NotificationCollName, bson.D{{Key: "toUserOId", Value: userOId}}, bson.D{{Key: "read", Value: true}})
 }

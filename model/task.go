@@ -27,7 +27,7 @@ type Task struct {
 	BaseData     `bson:"inline"`
 	FromUserOId  *primitive.ObjectID `bson:"fromUserOId" json:"fromUserOId" example:"abd1234"`       // 指派帳號id
 	FromUser     *User               `bson:"fromUser,omitempty" json:"fromUser"`                     // 指派帳號
-	ToUserOId    *primitive.ObjectID `bson:"ToUserOId" json:"ToUserOId" example:"abd1234"`           // 被指派帳號id
+	ToUserOId    *primitive.ObjectID `bson:"ToUserOId" json:"toUserOId" example:"abd1234"`           // 被指派帳號id
 	ToUser       *User               `bson:"toUser,omitempty" json:"toUser"`                         // 指派帳號
 	ProgressType ProgressType        `bson:"progressType" json:"progressType" example:"TODO"`        // 任務完成度 TODO, DOING, TEST, DONE
 	Deadline     string              `bson:"deadline" json:"deadline" example:"2024-01-03"`          // 結束日期
