@@ -77,6 +77,7 @@ JWTKey=
 
 ### notification 通知
 - PATCH /notification/{id}/read: 已讀通知（需為被發送者）
+- PATCH /notification/read/all: 已讀自己所有通知
 
 ## Customized Error Code
 - InternalServerError: 000001
