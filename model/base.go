@@ -167,6 +167,28 @@ func Update(collectionName string, objectId *primitive.ObjectID, rawData interfa
 	return nil
 }
 
+// 依條件更新
+func UpdateByFilter(collectionName string, filter interface{}, rawData interface{}) error {
+	util.BlueLog("Update(%s) filter(%+v) data(%+v)", collectionName, filter, rawData)
+
+	data, err := structToBsonM(rawData)
+	if err != nil {
+		return err
+	}
+	data["updatedAt"] = time.Now()
+
+	c, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	_, err = config.GetCollection(config.GetDB(), collectionName).UpdateMany(c, filter, bson.M{"$set": data})
+	if err != nil {
+		util.RedLog("Update err: %s", err.Error())
+		return err
+	}
+
+	return nil
+}
+
 // 啟用
 func Enable(collectionName string, objectId *primitive.ObjectID) error {
 	util.BlueLog("Enable(%s) objectId(%+v)", collectionName, objectId)
