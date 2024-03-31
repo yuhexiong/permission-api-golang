@@ -76,6 +76,7 @@ JWTKey=
 - DELETE /task/{id}: 刪除任務（需有權限/需為原先指派者）
 
 ### notification 通知
+- GET /notification: 搜尋所有通知（時間從近排到遠）
 - PATCH /notification/{id}/read: 已讀通知（需為被發送者）
 - PATCH /notification/read/all: 已讀自己所有通知
 

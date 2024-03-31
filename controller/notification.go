@@ -6,6 +6,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type createNotificationOpts struct {
@@ -20,6 +21,22 @@ func createNotification(opts createNotificationOpts, result *model.Notification)
 		Content:   opts.Content,
 	}
 	return model.Insert(model.NotificationCollName, createdNotification, result)
+}
+
+type FindNotificationOpts struct {
+	ToUserOId *primitive.ObjectID `json:"toUserOId" bson:"toUserOId" binding:"required" example:"623850247ea4cca15cd55303"` // 被發送帳號id
+}
+
+// 取得通知
+func FindNotification(opts FindNotificationOpts, result *[]*model.Notification) error {
+	filter := bson.D{{Key: "toUserOId", Value: opts.ToUserOId}}
+
+	pipeline := mongo.Pipeline{
+		{{Key: "$match", Value: filter}},
+		{{Key: "$sort", Value: bson.D{{Key: "createdAt", Value: -1}}}},
+	}
+
+	return model.FindByPipeline(model.NotificationCollName, pipeline, result)
 }
 
 // 已讀通知

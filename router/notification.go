@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"permission-api/controller"
 	"permission-api/middleware"
+	"permission-api/model"
 	"permission-api/response"
 	"permission-api/util"
 
@@ -12,8 +13,21 @@ import (
 )
 
 func InitNotificationRouter(routerGroup *gin.RouterGroup) {
+	RouterPerms(routerGroup, http.MethodGet, "/", findNotification)
 	RouterPerms(routerGroup, http.MethodPatch, "/:id/read", readNotification)
 	RouterPerms(routerGroup, http.MethodPatch, "/read/all", readAllNotification)
+}
+
+func findNotification(c *gin.Context) {
+	userOId := middleware.GetUserOId(c)
+
+	notification := []*model.Notification{}
+	if err := controller.FindNotification(controller.FindNotificationOpts{ToUserOId: userOId}, &notification); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, notification)
 }
 
 type readNotificationReqParm struct {
