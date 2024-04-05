@@ -9,8 +9,7 @@ import (
 
 func ErrorHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		lastErr := c.Errors.Last()
-		if lastErr != nil {
+		if lastErr := c.Errors.Last(); lastErr != nil {
 			if apiError, ok := errors.Cause(lastErr.Err).(util.ErrorFormat); ok {
 				c.JSON(apiError.StatusCode, gin.H{"code": apiError.Code, "message": apiError.Message})
 				return

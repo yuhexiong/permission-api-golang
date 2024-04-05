@@ -13,6 +13,8 @@ func InitRouter() *gin.Engine {
 	router.Use(gin.Logger())
 	router.Use(gin.Recovery())
 
+	router.Use(middleware.ErrorHandler())
+
 	routerWithAuth := router.Group("")
 	routerWithAuth.Use(middleware.AuthorizeToken)
 
