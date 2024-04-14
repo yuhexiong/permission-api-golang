@@ -50,32 +50,32 @@ JWTKey=
 
 ## API
 
-### auth 權限
+### auth 身分認證(基本權限設定)
 - POST /auth/login: 登入（不需要帶token）
 - POST /auth/logout: 登出
 
-### user 使用者
+### user 使用者(基本權限設定)
 - PATCH /user/myPassword: 修改自己的密碼
 - PATCH /user/{userId}/password: 修改別人的密碼（需有權限）
 - POST /user: 建立使用者（需有權限）
 - POST /user/find: 搜尋使用者
 
-### mapUserPermission 使用者與權限關聯
+### mapUserPermission 使用者與權限關聯(基本權限設定)
 - POST /mapUserPermission: 建立使用者與權限關聯（需有權限）
 - POST /mapUserPermission/find: 搜尋使用者與權限關聯（需有權限）
 - DELETE /mapUserPermission/{id}: 刪除使用者與權限關聯（需有權限）
 
-### permission 權限
+### permission 權限(基本權限設定)
 - POST /permission/find: 搜尋所有權限（需有權限）
 
-### task 任務
+### task 任務(權限相關應用)
 - POST /task: 分派任務（需有權限）
 - POST /task/find: 搜尋所有任務
 - PATCH /task/{id}/progressType/{progressType}: 更新任務進度（需為原先指派者或被指派者/DONE前須驗收完畢/DELETE需為原先指派者）, 移致測試會發送通知原先指派者驗收
 - PATCH /task/{id}/checked/{checked}: 驗收/驗收失敗任務（需有權限/需為原先指派者）, 驗收成功會發送通知給被指派者
 - DELETE /task/{id}: 刪除任務（需有權限/需為原先指派者）
 
-### notification 通知
+### notification 通知(權限相關應用)
 - GET /notification: 搜尋所有通知（時間從近排到遠）
 - PATCH /notification/{id}/read: 已讀通知（需為被發送者）
 - PATCH /notification/read/all: 已讀自己所有通知
