@@ -36,6 +36,7 @@ func createTask(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, task)
+	c.Next()
 }
 
 func findTask(c *gin.Context) {
@@ -52,6 +53,7 @@ func findTask(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, tasks)
+	c.Next()
 }
 
 type updateTaskProgressReqParm struct {
@@ -80,6 +82,7 @@ func updateTaskProgress(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, gin.H{})
+	c.Next()
 }
 
 type checkedTaskReqParm struct {
@@ -108,6 +111,7 @@ func checkTask(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, gin.H{})
+	c.Next()
 }
 
 type deleteTaskReqParm struct {
@@ -135,4 +139,5 @@ func deleteTask(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, gin.H{})
+	c.Next()
 }

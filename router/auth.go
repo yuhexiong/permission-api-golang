@@ -35,6 +35,7 @@ func login(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, token)
+	c.Next()
 }
 
 func logout(c *gin.Context) {
@@ -52,4 +53,5 @@ func logout(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, gin.H{})
+	c.Next()
 }

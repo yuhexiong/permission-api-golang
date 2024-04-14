@@ -28,4 +28,5 @@ func findPermission(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, permissions)
+	c.Next()
 }

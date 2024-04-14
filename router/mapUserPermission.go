@@ -33,6 +33,7 @@ func createUserPermission(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, userPermission)
+	c.Next()
 }
 
 func findUserPermission(c *gin.Context) {
@@ -49,6 +50,7 @@ func findUserPermission(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, userPermissions)
+	c.Next()
 }
 
 type deleteUserPermissionReqParm struct {
@@ -74,4 +76,5 @@ func deleteUserPermission(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, gin.H{})
+	c.Next()
 }

@@ -46,6 +46,7 @@ func resetPassword(c *gin.Context) {
 	sessionController.DeleteSessionByUserOId(user.ID)
 
 	response.SuccessFormat(c, gin.H{})
+	c.Next()
 }
 
 type changePasswordReqParm struct {
@@ -85,6 +86,7 @@ func changePassword(c *gin.Context) {
 	sessionController.DeleteSessionByUserOId(user.ID)
 
 	response.SuccessFormat(c, gin.H{})
+	c.Next()
 }
 
 func createUser(c *gin.Context) {
@@ -113,6 +115,7 @@ func createUser(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, createdUser)
+	c.Next()
 }
 
 func findUser(c *gin.Context) {
@@ -129,4 +132,5 @@ func findUser(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, users)
+	c.Next()
 }

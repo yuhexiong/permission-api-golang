@@ -28,6 +28,7 @@ func findNotification(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, notification)
+	c.Next()
 }
 
 type readNotificationReqParm struct {
@@ -55,6 +56,7 @@ func readNotification(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, gin.H{})
+	c.Next()
 }
 
 func readAllNotification(c *gin.Context) {
@@ -66,4 +68,5 @@ func readAllNotification(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, gin.H{})
+	c.Next()
 }
