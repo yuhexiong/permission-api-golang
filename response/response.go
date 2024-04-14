@@ -22,7 +22,7 @@ func SuccessFormat(c *gin.Context, data interface{}) {
 func AbortError(c *gin.Context, err error) {
 	apiError, ok := err.(util.ErrorFormat)
 	if !ok {
-		c.JSON(http.StatusInternalServerError, gin.H{"code": "000001", "message": err.Error()})
+		c.JSON(http.StatusInternalServerError, util.InternalServerError(err.Error()))
 		c.Abort()
 	}
 

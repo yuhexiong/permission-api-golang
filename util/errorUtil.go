@@ -1,6 +1,8 @@
 package util
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type ErrorFormat struct {
 	StatusCode int    `json:"statusCode"` // http狀態碼
@@ -10,6 +12,10 @@ type ErrorFormat struct {
 
 func (apiError ErrorFormat) Error() string {
 	return apiError.Message
+}
+
+func InternalServerError(message string) ErrorFormat {
+	return ErrorFormat{StatusCode: http.StatusBadRequest, Code: "000001", Message: "[InternalServer]" + message}
 }
 
 func InvalidTokenError(message string) ErrorFormat {

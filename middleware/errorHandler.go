@@ -1,43 +1,31 @@
 package middleware
 
 import (
-	"context"
-	"net/http"
+	"fmt"
+	"permission-api/response"
 	"permission-api/util"
 
-	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
-)
 
-type contextKey string
-
-const (
-	errorCodeKey    contextKey = "errorCode"
-	errorMessageKey contextKey = "errorMessage"
+	"github.com/gin-gonic/gin"
 )
 
 func ErrorHandler() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		statusCode := http.StatusInternalServerError
-		errorCode := "000001"
-		errorMessage := ""
+		defer func() {
 
-		if lastErr := c.Errors.Last(); lastErr != nil {
-			if apiError, ok := errors.Cause(lastErr.Err).(util.ErrorFormat); ok {
-				errorCode = apiError.Code
-				errorMessage = apiError.Message
-			} else {
-				errorMessage = lastErr.Err.Error()
+			if err := recover(); err != nil {
+				errorMessage := "Unknown error"
+				if e, ok := err.(error); ok {
+					errorMessage = fmt.Sprintf("%+v", e)
+					stackTrace := fmt.Sprintf("%+v", errors.WithStack(e))
+					util.RedLog("Stack Trace: %s\n", stackTrace)
+				}
+
+				response.AbortError(c, util.InternalServerError(errorMessage))
 			}
 
-			c.JSON(statusCode, gin.H{"code": errorCode, "message": errorMessage})
-
-			// save err for saveLogMiddleware
-			ctx := context.WithValue(c.Request.Context(), errorCodeKey, errorCode)
-			ctx = context.WithValue(ctx, errorMessageKey, errorMessage)
-			c.Request = c.Request.WithContext(ctx)
-
-		}
+		}()
 
 		c.Next()
 	}
