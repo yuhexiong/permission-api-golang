@@ -12,6 +12,7 @@ import (
 
 func InitSettingRouter(routerGroup *gin.RouterGroup) {
 	RouterPerms(routerGroup, http.MethodGet, "/:code", getSettingByCode)
+	RouterPerms(routerGroup, http.MethodPatch, "/:code/:value", updateSettingValue)
 }
 
 type getSettingByCodeReqParm struct {
@@ -32,5 +33,26 @@ func getSettingByCode(c *gin.Context) {
 	}
 
 	response.SuccessFormat(c, setting)
+	c.Next()
+}
+
+type updateSettingValueReqParm struct {
+	Code  string `uri:"code" binding:"required"`
+	Value string `uri:"value" binding:"required"`
+}
+
+func updateSettingValue(c *gin.Context) {
+	var params updateSettingValueReqParm
+	if err := c.ShouldBindUri(&params); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	if err := controller.UpdateSettingValue(&params.Code, &params.Value); err != nil {
+		response.AbortError(c, util.InvalidParameterError(err.Error()))
+		return
+	}
+
+	response.SuccessFormat(c, nil)
 	c.Next()
 }
