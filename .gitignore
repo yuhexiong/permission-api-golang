@@ -1,3 +1,4 @@
 etc/apiPermission.yaml
 .env
 tmp/
+logFile.log

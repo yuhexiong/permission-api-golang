@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 	"permission-api/config"
@@ -16,6 +17,16 @@ import (
 )
 
 func main() {
+	// open logFile
+	logFile, err := os.OpenFile("logFile.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	if err != nil {
+		util.RedLog("Unable to open file", err)
+	}
+	defer logFile.Close()
+
+	// setup log
+	log.SetOutput(logFile)
+
 	// database
 	config.ConnectDB()
 
@@ -32,6 +43,7 @@ func main() {
 	apiPortStr := os.Getenv("API_PORT")
 	apiPort, err := strconv.Atoi(apiPortStr)
 	if err != nil {
+		util.RedLog("api port error:", err)
 		panic(err)
 	}
 
