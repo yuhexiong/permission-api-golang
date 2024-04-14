@@ -69,6 +69,10 @@ JWTKey=
 ### permission 權限（基本權限設定）
 - POST /permission/find: 搜尋所有權限（需有權限）
 
+### setting 設定（權限相關應用）
+- GET /setting/{code}: 搜尋設定
+- PATCH /setting/{code}/{value}: 更新設定值（需有權限）
+
 ### task 任務（權限相關應用）
 - POST /task: 分派任務（需有權限）
 - POST /task/find: 搜尋所有任務

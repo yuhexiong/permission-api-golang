@@ -17,6 +17,9 @@ PermissionDefs:
   FindPermission:
     Category: "PERMISSION"
     Code: "findPermission"
+  UpdateSetting:
+    Category: "SETTING"
+    Code: "updateSetting"
   CreateTask:
     Category: "TASK"
     Code: "createTask"
@@ -48,6 +51,10 @@ APIToPermission:
     Methods: "POST"
     PermissionName: "FindPermission"
     PermissionOp: "R"
+  - Url: "/setting/:code/:value"
+    Methods: "PATCH"
+    PermissionName: "UpdateSetting"
+    PermissionOp: "W"
   - Url: "/task"
     Methods: "POST"
     PermissionName: "CreateTask"
