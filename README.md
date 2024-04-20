@@ -8,7 +8,7 @@ With logFile to record all log.
 
 - Language: Go v1.21.1
 - Web FrameWork: Gin v1.9.1
-- MongoDB v7.0.2
+- DataBase: MongoDB v7.0.2
 
 ## Run
 
