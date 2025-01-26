@@ -1,14 +1,19 @@
 # Permission API
+
+
+**(also provided Traditional Chinese version document [README-CH.md](README-CH.md).)**
+
+
 About how to set permissions in a YAML file and read them using Viper.  
-Automatically Review permissions and update database.  
-And create a system user （username: admin, password: in .env） with all permissions each time the project is launched.
-With logFile to record all log.  
+Automatically review permissions and update the database.  
+And create a system user (username: admin, password: in .env) with all permissions each time the project is launched.  
+With logFile to record all logs.
 
 ## Overview
 
 - Language: Go v1.21.1
-- Web FrameWork: Gin v1.9.1
-- DataBase: MongoDB v7.0.2
+- Web Framework: Gin v1.9.1
+- Database: MongoDB v7.0.2
 
 ## Run
 
@@ -25,7 +30,7 @@ go run main.go
 
 
 ## Permission
-copy etc/apiPermission.yaml.default and rename as etc/apiPermission.yaml to restrict api access rights.   
+Copy `etc/apiPermission.yaml.default` and rename it to `etc/apiPermission.yaml` to restrict API access rights.  
 ```
 PermissionDefs:
   ChangePassword:
@@ -40,7 +45,7 @@ APIToPermission:
 
 
 ## ENV
-copy .env.default and rename as .env
+Copy `.env.default` and rename it to `.env`
 ```
 MONGO_URL=
 DB_NAME=
@@ -51,39 +56,39 @@ JWTKey=
 
 ## API
 
-### auth 身分認證（基本權限設定）
-- POST /auth/login: 登入（不需要帶token）
-- POST /auth/logout: 登出
+### auth
+- POST /auth/login: Login (no token required)
+- POST /auth/logout: Logout
 
-### user 使用者（基本權限設定）
-- PATCH /user/myPassword: 修改自己的密碼
-- PATCH /user/{userId}/password: 修改別人的密碼（需有權限）
-- POST /user: 建立使用者（需有權限）
-- POST /user/find: 搜尋使用者
+### user
+- PATCH /user/myPassword: Change own password
+- PATCH /user/{userId}/password: Change another user's password (requires permission)
+- POST /user: Create a user (requires permission)
+- POST /user/find: Search for users
 
-### mapUserPermission 使用者與權限關聯（基本權限設定）
-- POST /mapUserPermission: 建立使用者與權限關聯（需有權限）
-- POST /mapUserPermission/find: 搜尋使用者與權限關聯（需有權限）
-- DELETE /mapUserPermission/{id}: 刪除使用者與權限關聯（需有權限）
+### mapUserPermission
+- POST /mapUserPermission: Create user-permission mapping (requires permission)
+- POST /mapUserPermission/find: Search user-permission mapping (requires permission)
+- DELETE /mapUserPermission/{id}: Delete user-permission mapping (requires permission)
 
-### permission 權限（基本權限設定）
-- POST /permission/find: 搜尋所有權限（需有權限）
+### permission
+- POST /permission/find: Search all permissions (requires permission)
 
-### setting 設定（權限相關應用）
-- GET /setting/{code}: 搜尋設定
-- PATCH /setting/{code}/{value}: 更新設定值（需有權限）
+### setting
+- GET /setting/{code}: Get setting by code
+- PATCH /setting/{code}/{value}: Update setting value (requires permission)
 
-### task 任務（權限相關應用）
-- POST /task: 分派任務（需有權限）
-- POST /task/find: 搜尋所有任務
-- PATCH /task/{id}/progressType/{progressType}: 更新任務進度（需為原先指派者或被指派者/DONE前須驗收完畢/DELETE需為原先指派者）, 移致測試會發送通知原先指派者驗收
-- PATCH /task/{id}/checked/{checked}: 驗收/驗收失敗任務（需有權限/需為原先指派者）, 驗收成功會發送通知給被指派者
-- DELETE /task/{id}: 刪除任務（需有權限/需為原先指派者）
+### task
+- POST /task: Assign a task (requires permission)
+- POST /task/find: Search all tasks
+- PATCH /task/{id}/progressType/{progressType}: Update task progress (requires original assigner or assignee/DONE requires acceptance before completion/DELETE requires original assigner); notifications are sent to the original assigner for testing acceptance
+- PATCH /task/{id}/checked/{checked}: Accept or reject task completion (requires permission/original assigner); successful acceptance sends notifications to the assignee
+- DELETE /task/{id}: Delete a task (requires permission/original assigner)
 
-### notification 通知（權限相關應用）
-- GET /notification: 搜尋所有通知（時間從近排到遠）
-- PATCH /notification/{id}/read: 已讀通知（需為被發送者）
-- PATCH /notification/read/all: 已讀自己所有通知
+### notification
+- GET /notification: Retrieve all notifications (sorted from recent to oldest)
+- PATCH /notification/{id}/read: Mark a notification as read (must be the recipient)
+- PATCH /notification/read/all: Mark all personal notifications as read
 
 ## Customized Error Code
 - InternalServerError: 000001
